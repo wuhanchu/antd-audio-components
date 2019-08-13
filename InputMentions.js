@@ -28,13 +28,13 @@ export default React.memo(({ item, index, onChange, hotWordList }) => {
      */
     const getHotWordOptions = () => {
         const options = []
-        hotWordList.forEach(item => {
+        hotWordList && hotWordList.forEach(item => {
             item.hotWord &&
                 options.push(
                     <Option
                         key
-                        item={item.id}
                         Option
+                        item={item.id}
                         value={item.hotWord.substr(1)}
                     >
                         {item.hotWord}
