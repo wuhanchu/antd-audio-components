@@ -56,9 +56,7 @@ class component extends PureComponent {
             })
 
         this.wavesurfer.empty()
-        this.wavesurfer.load(
-            "http://ia902606.us.archive.org/35/items/shortpoetry_047_librivox/song_cjrg_teasdale_64kb.mp3"
-        )
+        this.wavesurfer.load(this.props.url)
         this.setEvents()
     }
 
@@ -74,9 +72,9 @@ class component extends PureComponent {
     }
 
     setEvents = () => {
-        this.wavesurfer.on("ready", () => {
-            this.setRegions()
-        })
+        // this.wavesurfer.on("ready", () => {
+        //     this.setRegions()
+        // })
 
         this.wavesurfer.on("pause", () => {
             console.log("did pause")
@@ -103,18 +101,19 @@ class component extends PureComponent {
             })
         })
         this.wavesurfer.on("region-out", region => {
-
+            console.log("region-out")
 
             // const { playId } = this.state
-
             // this.setState({ playId: null, continue: null }, () => {
             //     this.props.onPlayChange(null)
             // })
         })
-        this.wavesurfer.on("region-click", region => {
-            this.setState({ playId: region.id }, () => {
-                this.props.onPlayChange(region.id)
-            })
+        this.wavesurfer.on("region-click", (region, e) => {
+            e.stopPropagation()
+
+            console.log("region-click")
+            // region.play()
+            this.props.onPlayChange(region.id)
         })
     }
 
@@ -134,7 +133,8 @@ class component extends PureComponent {
         })
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate = (prevProps, prevState) => {
+        //  播放状态变化
         if (
             prevProps.pause !== this.props.pause &&
             this.state.pause !== this.props.pause
@@ -142,40 +142,32 @@ class component extends PureComponent {
             this.props.pause ? this.wavesurfer.pause() : this.wavesurfer.play()
         }
 
+        // 段落变化
         if (this.props.dialogue !== prevProps.dialogue) {
+            this.setDialogueMap()
             this.setRegions()
         }
 
+        // 播放位置变化
         if (
             this.props.playId != prevProps.playId &&
             this.state.playId != this.props.playId
         ) {
-            console.log(" prevProps.playId", prevProps.playId)
-
-            console.log(" this.props.playId", this.props.playId)
-            console.log(" this.state.playId", this.state.playId)
-
-            const region = this.regions[this.props.playId]
             this.setState(
                 {
                     playId: this.props.playId
                 },
                 () => {
-                    this.setState(
-                        { continue: false, continueId: this.props.playId },
-                        () => {
-                            if (!this.props.pause && region) {
-                                region.play()
-                                this.wavesurfer.play()
-                            }
-                        }
-                    )
+                    console.log("play regions", this.regions)
+
+                    const region = this.regions[this.props.playId]
+                    console.log("play region", region)
+                    if (!this.props.pause && region) {
+                        region.play()
+                        this.wavesurfer.play()
+                    }
                 }
             )
-        }
-
-        if (this.props.dialogue !== prevProps.dialogue) {
-            this.setDialogueMap()
         }
     }
 

@@ -1,4 +1,4 @@
-# antd 项目的语音相关组成控件
+# antd 项目的相关组成控件
 
 ## AudioPlayer 音频波形播放器
 
@@ -40,6 +40,6 @@ navigator.getUserMedia(
 )
 ```
 
-## 语音工具 wabutils
+## 工具 wabutils
 
 todo 后期再修改,进行分句。

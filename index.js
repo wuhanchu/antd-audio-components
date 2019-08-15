@@ -1,14 +1,7 @@
-import AudioPlayer from "./AudioPlayer"
-import InputMentions from "./InputMentions"
-import TalkTimeLIne from "./TalkTimeLine"
-import Recorder from "./recorder"
-require("./wav")
+export { AudioPlayer } from "./Audio/AudioPlayer"
+export { InputMentions } from "./Audio/InputMentions"
+export { TalkTimeLIne } from "./Audio/TalkTimeLine"
+export { Recorder } from "./Audio/recorder"
 
-export default {
-    AudioPlayer,
-    InputMentions,
-    TalkTimeLIne,
-    Recorder,
-    wavUtils: { vadCheck: vad_check, getWAV, encodeWAV }
-}
-
+require("./Audio/wav")
+export const wavUtils = { vadCheck: vad_check, getWAV, encodeWAV }

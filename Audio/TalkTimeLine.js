@@ -13,11 +13,12 @@ import {
 } from "antd"
 import { antdUtils, frSchema } from "@/outter"
 import Sound from "react-sound"
-import InputMentions from "@/components/Audio/InputMentions"
+import InputMentions from "@/components/Extra/Audio/InputMentions"
 import CheckableTag from "antd/es/tag/CheckableTag"
 
 const { createComponent } = antdUtils.utils.component
-const { actions, schemaFieldType } = frSchema
+
+const { actions, schemaFieldType, utils } = frSchema
 
 const { Text } = Typography
 const { Option } = Mentions
@@ -187,7 +188,7 @@ class component extends PureComponent {
         return (
             <Row
                 type="flex"
-                align={"middle"}
+                align={"bottom"}
                 gutter={8}
                 style={{ marginBottom: 12 }}
             >
@@ -197,7 +198,6 @@ class component extends PureComponent {
                             <Col>
                                 <Avatar icon="user" />
                             </Col>
-
                             <Col>
                                 {!item.id
                                     ? "未知用户"
@@ -218,8 +218,9 @@ class component extends PureComponent {
                     )}
                 </Fragment>
                 <Col>
-                    {item.startTime}
-                    {item.endTime && "-" + item.endTime}
+                    {utils.moment.getTimeShow(item.startTime)}
+                    {item.endTime &&
+                        " - " + utils.moment.getTimeShow(item.endTime)}
                 </Col>
                 {item.id && (
                     <Fragment>
@@ -231,6 +232,7 @@ class component extends PureComponent {
                                         : "play-circle"
                                 }
                                 style={{
+                                    marginTop: "8px",
                                     fontSize: "16px"
                                 }}
                                 onClick={() => {
@@ -352,7 +354,7 @@ class component extends PureComponent {
                             <Card
                                 bordered={false}
                                 bodyStyle={{
-                                    padding: "8px 8px 8px 8px"
+                                    padding: "0px 8px 8px 8px"
                                 }}
                             >
                                 {this.renderInfo(item)}
