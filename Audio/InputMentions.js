@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react"
 
 import { Mentions } from "antd"
 
-
 export default React.memo(({ item, index, onChange, hotWordList }) => {
     const [changeText, setChangeText] = useState(item.content) // 修改语句Text
     const [optionPrefix, setOptionPrefix] = useState([]) // 修改语句Text
@@ -28,19 +27,20 @@ export default React.memo(({ item, index, onChange, hotWordList }) => {
      */
     const getHotWordOptions = () => {
         const options = []
-        hotWordList && hotWordList.forEach(item => {
-            item.hotWord &&
-                options.push(
-                    <Option
-                        key
-                        Option
-                        item={item.id}
-                        value={item.hotWord.substr(1)}
-                    >
-                        {item.hotWord}
-                    </Option>
-                )
-        })
+        hotWordList &&
+            hotWordList.forEach(item => {
+                item.hotWord &&
+                    options.push(
+                        <Option
+                            key
+                            Option
+                            item={item.id}
+                            value={item.hotWord.substr(1)}
+                        >
+                            {item.hotWord}
+                        </Option>
+                    )
+            })
         return options
     }
 
@@ -49,9 +49,10 @@ export default React.memo(({ item, index, onChange, hotWordList }) => {
             placement={"填写信息"}
             size={"small"}
             defaultValue={changeText}
-            onBlur={() =>
+            onBlur={() => {
+                console.debug("Mentions onBlur")
                 onChange({ ...item, content: changeText }, index)
-            }
+            }}
             rows="3"
             autoFocus={true}
             onChange={changeText => setChangeText(changeText)}
