@@ -39,10 +39,13 @@ class component extends PureComponent {
 
     componentDidMount() {
         let wavesurfer = null
+        const container = document.querySelector("#waveform")
+        console.debug("container",container)
+
         this.wavesurfer =
             this.wavesurfer ||
             WaveSurfer.create({
-                container: document.querySelector("#waveform"),
+                container ,
                 height: 100,
                 scrollParent: true,
                 normalize: true,
@@ -56,7 +59,13 @@ class component extends PureComponent {
             })
 
         this.wavesurfer.empty()
-        this.wavesurfer.load(this.props.url)
+
+        if (this.props.url) {
+            this.wavesurfer.load(this.props.url, this.props.xhr)
+        } else if (this.props.file) {
+
+            this.wavesurfer.loadBlob(this.props.file)
+        }
         this.setEvents()
     }
 
@@ -72,10 +81,6 @@ class component extends PureComponent {
     }
 
     setEvents = () => {
-        // this.wavesurfer.on("ready", () => {
-        //     this.setRegions()
-        // })
-
         this.wavesurfer.on("pause", () => {
             console.log("did pause")
 
@@ -100,14 +105,7 @@ class component extends PureComponent {
                 this.props.onPauseChange(false)
             })
         })
-        this.wavesurfer.on("region-out", region => {
-            console.log("region-out")
 
-            // const { playId } = this.state
-            // this.setState({ playId: null, continue: null }, () => {
-            //     this.props.onPlayChange(null)
-            // })
-        })
         this.wavesurfer.on("region-click", (region, e) => {
             e.stopPropagation()
 
@@ -203,13 +201,6 @@ class component extends PureComponent {
                             </Button>
                         )}
                     </Col>
-                    {/*
-                    <Col>
-                        <Button>清除 </Button>
-                    </Col>
-                    <Col>
-                        <Button>撤销</Button>
-                    </Col> */}
                 </Row>
             </Fragment>
         )
