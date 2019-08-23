@@ -40,30 +40,31 @@ class component extends PureComponent {
     componentDidMount() {
         let wavesurfer = null
         const container = document.querySelector("#waveform")
-        console.debug("container",container)
+        console.debug("this.props.xhr", this.props.xhr)
 
+        //  create element
         this.wavesurfer =
             this.wavesurfer ||
             WaveSurfer.create({
-                container ,
-                height: 100,
+                container,
+                height: 50,
                 scrollParent: true,
                 normalize: true,
-                backend: "MediaElement",
                 plugins: [
                     RegionPlugin.create(),
                     TimelinePlugin.create({
                         container: "#wave-timeline"
                     })
-                ]
+                ],
+                xhr: { ...this.props.xhr }
             })
 
         this.wavesurfer.empty()
 
+        // load the file
         if (this.props.url) {
-            this.wavesurfer.load(this.props.url, this.props.xhr)
+            this.wavesurfer.load(this.props.url)
         } else if (this.props.file) {
-
             this.wavesurfer.loadBlob(this.props.file)
         }
         this.setEvents()
