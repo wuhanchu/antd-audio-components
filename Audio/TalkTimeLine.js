@@ -7,13 +7,13 @@ import {
     Mentions,
     Row,
     Spin,
-    Tag,
     Timeline,
     Typography
 } from "antd"
 import { antdUtils, frSchema } from "@/outter"
 import InputMentions from "@/components/Extra/Audio/InputMentions"
 import CheckableTag from "antd/es/tag/CheckableTag"
+import "keyboardjs"
 
 const { createComponent } = antdUtils.utils.component
 
@@ -30,17 +30,17 @@ export const RECORD_TYPE = {
 
 /**
  *   dialogue, // 对话数据
-    hotWordList, // 热词
-    labels, // 标签
-    playId, //当前播放的id
-    running, //开启录音标志
-    pause, // 播放暂停标志
-    showUserSelect, // 是否开启用户选择
-    reverse, // 是否反转显示数据
-    onTextChange, //对话修改
-    onUserChange, //对话修改
-    onLabelChange, // 标志修改
-    onPlayChange // playid 修改
+ hotWordList, // 热词
+ labels, // 标签
+ playId, //当前播放的id
+ running, //开启录音标志
+ pause, // 播放暂停标志
+ showUserSelect, // 是否开启用户选择
+ reverse, // 是否反转显示数据
+ onTextChange, //对话修改
+ onUserChange, //对话修改
+ onLabelChange, // 标志修改
+ onPlayChange // playid 修改
  */
 class component extends PureComponent {
     mention = React.createRef()
@@ -100,7 +100,8 @@ class component extends PureComponent {
         // 下一条
         key = "tab"
         method = e => {
-            this.onBlurSkip = true
+            e.preventDefault()
+
             const { changeId } = this.state
 
             let nextItem = null
@@ -135,7 +136,6 @@ class component extends PureComponent {
         key = "shift + tab"
         method = e => {
             e.preventDefault()
-            this.onBlurSkip = true
 
             const { changeId } = this.state
             if (!changeId) {
@@ -214,7 +214,10 @@ class component extends PureComponent {
     setDialogueMap() {
         this.props.dialogue &&
             this.props.dialogue.forEach((item, index) => {
-                this.dialogueMap[item.id] = { item, index }
+                this.dialogueMap[item.id] = {
+                    item,
+                    index
+                }
             })
     }
 
@@ -370,18 +373,21 @@ class component extends PureComponent {
      */
     renderInput(item) {
         const { changeId } = this.state
+        const style = { fontSize: "1.5em" }
 
         return changeId && changeId === item.id ? (
             this.renderMentions(item)
         ) : (
             <div
                 style={{ marginLeft: 12 }}
-                onClick={() => {
-                    this.onBlurSkip = true
+                onClick={e => {
+                    console.debug("input click", item)
                     this.setState({ changeId: item.id })
+                    e.stopPropagation()
+                    e.preventDefault()
                 }}
             >
-                <Text disabled={!item.content.trim()}>
+                <Text disabled={!item.content.trim()} style={style}>
                     {item.content.trim() || "空数据"}
                 </Text>
             </div>
@@ -411,14 +417,21 @@ class component extends PureComponent {
             <InputMentions
                 item={item}
                 index={index}
+                style={{
+                    fontSize: "1.5em"
+                }}
                 hotWordList={hotWordList}
-                onBlur={() => {
-                    console.log("onBlur", item)
-                    !this.onBlurSkip &&
-                        this.setState({
-                            changeId: null
-                        })
-                    this.onBlurSkip = false
+                onBlur={item => {
+                    console.debug("onBlur", item)
+                    //
+                    // // !this.onBlurSkip &&
+                    // setTimeout(() => {
+                    //     item &&
+                    //         item.id == this.state.changeId &&
+                    //         this.setState({
+                    //             changeId: null
+                    //         })
+                    // })
                 }}
                 onFocus={() => {
                     console.log("onFocus", item)
@@ -469,7 +482,7 @@ class component extends PureComponent {
                                     justify={"space-between"}
                                     gutter={20}
                                 >
-                                    <Col span={20}>
+                                    <Col span={24}>
                                         {this.renderInput(item)}
                                     </Col>
                                     {labels && item.id && (

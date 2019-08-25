@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react"
 
-import {  Mentions } from "antd"
+import { Mentions } from "antd"
 
 export default React.memo(
-    ({ item, index, onBlur, onFocus, onChange, hotWordList }) => {
+    ({ item, index, onBlur, onFocus, onChange, hotWordList, style }) => {
         const [changeText, setChangeText] = useState(item.content) // 修改语句Text
         const [optionPrefix, setOptionPrefix] = useState([]) // 修改语句Text
         let mention = React.createRef()
@@ -58,13 +58,14 @@ export default React.memo(
                 size={"small"}
                 defaultValue={changeText}
                 onBlur={event => {
+                    console.debug("onBlur event", event)
                     onChange({ ...item, content: changeText }, index)
-                    onBlur && onBlur()
+                    onBlur && onBlur(item)
                 }}
                 onFocus={() => {
                     onFocus && onFocus(item)
                 }}
-                rows="3"
+                rows="2"
                 autoFocus={true}
                 onChange={changeText => setChangeText(changeText)}
                 split={""}
@@ -73,6 +74,7 @@ export default React.memo(
                         return changeText.endsWith(option.children.substr(0, i))
                     }
                 }}
+                style={style}
                 prefix={optionPrefix}
                 validateSearch={(text, props) => {
                     const result = optionPrefix.some(item =>
