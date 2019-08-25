@@ -12,7 +12,6 @@ import {
     Typography
 } from "antd"
 import { antdUtils, frSchema } from "@/outter"
-import Sound from "react-sound"
 import InputMentions from "@/components/Extra/Audio/InputMentions"
 import CheckableTag from "antd/es/tag/CheckableTag"
 
@@ -41,12 +40,15 @@ export const RECORD_TYPE = {
     onTextChange, //对话修改
     onUserChange, //对话修改
     onLabelChange, // 标志修改
-    onPlayIdChange // playid 修改
+    onPlayChange // playid 修改
  */
 class component extends PureComponent {
+    mention = React.createRef()
+    keyBindMethods = []
+
     state = {
-        changeId: null, // 当前修改ID
-        playId: null // 当前播放ID
+        changeId: null // 当前修改ID
+        // playId: null // 当前播放ID
     }
 
     dialogueMap = {}
@@ -54,32 +56,165 @@ class component extends PureComponent {
     constructor(props) {
         super(props)
         this.setDialogueMap()
+        this.bindKey()
     }
 
     componentDidUpdate(prevProps, prevState) {
         // play 切换
-        if (this.state.playId !== prevState.playId) {
-            this.props.onPlayChange(this.state.playId)
-            this.state.playId &&
-                this.scrollToItem(this.dialogueMap[this.state.playId])
-        }
-
-        if (
-            this.props.playId !== prevProps.playId &&
-            this.props.playId !== this.state.playId
-        ) {
-            this.setState({ playId: this.props.playId })
+        if (this.props.playId !== prevProps.playId) {
+            this.props.playId &&
+                this.scrollToItem(this.dialogueMap[this.props.playId].item)
         }
 
         if (this.props.dialogue !== prevProps.dialogue) {
             this.setDialogueMap()
         }
+
+        // changeId 正式
+        if (this.state.changeId !== prevState.changeId) {
+            this.props.onChangeIdChange &&
+                this.props.onChangeIdChange(this.state.changeId)
+            this.props.onPauseChange(!this.state.changeId)
+        }
+    }
+
+    /**
+     * 绑定按键
+     */
+    bindKey = () => {
+        let { keyBindMethods } = this
+        let method = null
+        let key = null
+
+        // 退出
+        key = "esc"
+        method = e => {
+            this.setState({ changeId: null })
+        }
+        keyboardJS.bind(key, method)
+        keyBindMethods.push({
+            key,
+            method
+        })
+
+        // 下一条
+        key = "tab"
+        method = e => {
+            this.onBlurSkip = true
+            const { changeId } = this.state
+
+            let nextItem = null
+            if (changeId) {
+                const nextIndex =
+                    this.dialogueMap[this.state.changeId].index + 1
+                nextItem = this.props.dialogue[nextIndex]
+            }
+
+            if (!nextItem) {
+                nextItem = this.props.dialogue[0]
+            }
+
+            if (!nextItem) {
+                this.setState({
+                    changeId: null
+                })
+                return
+            }
+
+            this.setState({
+                changeId: nextItem.id
+            })
+        }
+        keyboardJS.bind(key, method)
+        keyBindMethods.push({
+            key,
+            method
+        })
+
+        // 上一条
+        key = "shift + tab"
+        method = e => {
+            e.preventDefault()
+            this.onBlurSkip = true
+
+            const { changeId } = this.state
+            if (!changeId) {
+                return
+            }
+
+            const nextIndex = this.dialogueMap[this.state.changeId].index - 1
+            const nextItem = this.props.dialogue[nextIndex]
+
+            if (!nextItem) {
+                this.setState({
+                    changeId: null
+                })
+                return
+            }
+
+            this.setState({
+                changeId: nextItem.id
+            })
+        }
+        keyboardJS.bind(key, method)
+        keyBindMethods.push({
+            key,
+            method
+        })
+
+        // 播放 or 暂停
+        key = "ctrl + space"
+        method = e => {
+            e.preventDefault()
+            this.props.onPauseChange(!this.props.pause)
+        }
+        keyboardJS.bind(key, method)
+        keyBindMethods.push({
+            key,
+            method
+        })
+
+        // 播放 or 暂停
+        key = "space"
+        method = e => {
+            if (this.state.changeId) {
+                return
+            }
+
+            e.preventDefault()
+            this.props.onPauseChange(!this.props.pause)
+        }
+
+        keyboardJS.bind(key, method)
+        keyBindMethods.push({
+            key,
+            method
+        })
+
+        // 提交
+        key = "ctrl + enter"
+        method = e => {
+            e.preventDefault()
+            this.props.onPauseChange(!this.props.pause)
+        }
+        keyboardJS.bind(key, method)
+        keyboardJS.bind(key, method)
+        keyBindMethods.push({
+            key,
+            method
+        })
+    }
+
+    componentWillUnmount = () => {
+        this.keyBindMethods.forEach(({ key, method }) => {
+            keyboardJS.unbind(key, method)
+        })
     }
 
     setDialogueMap() {
         this.props.dialogue &&
-            this.props.dialogue.forEach(item => {
-                this.dialogueMap[item.id] = item
+            this.props.dialogue.forEach((item, index) => {
+                this.dialogueMap[item.id] = { item, index }
             })
     }
 
@@ -125,45 +260,11 @@ class component extends PureComponent {
     }
 
     /**
-     * 渲染播放器
-     * @param item
-     * @param index
-     * @returns {*}
-     */
-    renderSound = (item, index) => {
-        const { dialogue } = this.props
-
-        return (
-            <Sound
-                url={"/api/get_log_wav?logid=" + item.id}
-                onFinishedPlaying={() => {
-                    let next = false
-                    dialogue.some(dialogueItem => {
-                        if (next) {
-                            this.setState({ playId: item.id })
-                            return true
-                        }
-
-                        if (dialogueItem.id === item.id) {
-                            next = true
-                        }
-                    })
-                }}
-                playStatus={
-                    item.id === playId
-                        ? Sound.status.PLAYING
-                        : Sound.status.STOPPED
-                }
-            />
-        )
-    }
-
-    /**
      * 渲染头部信息
      * @param {*} item
      */
     renderInfo(item) {
-        const { playId } = this.state
+        const { playId } = this.props
 
         /**
          * 数据修改模型
@@ -235,37 +336,27 @@ class component extends PureComponent {
                                     marginTop: "8px",
                                     fontSize: "16px"
                                 }}
-                                onClick={() => {
-                                    this.setState(
-                                        {
-                                            playId: item.id
-                                        },
-                                        () => {
-                                            if (playId === item.id) {
-                                                this.props.onPauseChange(
-                                                    !this.props.pause
-                                                )
-                                            } else {
-                                                this.props.onPauseChange(false)
-                                            }
-                                        }
-                                    )
+                                onClick={e => {
+                                    this.setState({
+                                        changeId: item.id
+                                    })
+                                    playId === item.id &&
+                                        this.props.onPauseChange(
+                                            !this.props.pause
+                                        )
                                 }}
                             />
-                            {this.props.renderSound &&
-                                this.renderSound(item, index)}
                         </Col>
                         <Col>
-                            {this.state.playId === item.id &&
-                                !this.props.pause && (
-                                    <Icon
-                                        style={{
-                                            fontSize: "16px"
-                                        }}
-                                        type="sync"
-                                        spin
-                                    />
-                                )}
+                            {playId === item.id && !this.props.pause && (
+                                <Icon
+                                    style={{
+                                        fontSize: "16px"
+                                    }}
+                                    type="sync"
+                                    spin
+                                />
+                            )}
                         </Col>
                     </Fragment>
                 )}
@@ -286,6 +377,7 @@ class component extends PureComponent {
             <div
                 style={{ marginLeft: 12 }}
                 onClick={() => {
+                    this.onBlurSkip = true
                     this.setState({ changeId: item.id })
                 }}
             >
@@ -320,6 +412,20 @@ class component extends PureComponent {
                 item={item}
                 index={index}
                 hotWordList={hotWordList}
+                onBlur={() => {
+                    console.log("onBlur", item)
+                    !this.onBlurSkip &&
+                        this.setState({
+                            changeId: null
+                        })
+                    this.onBlurSkip = false
+                }}
+                onFocus={() => {
+                    console.log("onFocus", item)
+                    this.setState({
+                        changeId: item.id
+                    })
+                }}
                 onChange={this.props.onTextChange}
             />
         )
