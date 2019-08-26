@@ -2,16 +2,19 @@ import React, { useEffect, useState } from "react"
 
 import { Mentions } from "antd"
 
+/**
+ * 输入提示
+ */
 export default React.memo(
     ({ item, index, onBlur, onFocus, onChange, hotWordList, style }) => {
         const [changeText, setChangeText] = useState(item.content) // 修改语句Text
         const [optionPrefix, setOptionPrefix] = useState([]) // 修改语句Text
         let mention = React.createRef()
-
-        useEffect(() => {
-            console.log("mention", mention)
-            mention && mention.current && mention.current.focus()
-        })
+        //
+        // useEffect(() => {
+        //     console.log("mention", mention)
+        //     mention && mention.current && mention.current.focus()
+        // })
 
         useEffect(
             () =>

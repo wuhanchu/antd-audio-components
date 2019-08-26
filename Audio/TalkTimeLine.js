@@ -37,7 +37,7 @@ export const RECORD_TYPE = {
  pause, // 播放暂停标志
  showUserSelect, // 是否开启用户选择
  reverse, // 是否反转显示数据
- onTextChange, //对话修改
+ onItemChange, //对话修改
  onUserChange, //对话修改
  onLabelChange, // 标志修改
  onPlayChange // playid 修改
@@ -75,6 +75,11 @@ class component extends PureComponent {
             this.props.onChangeIdChange &&
                 this.props.onChangeIdChange(this.state.changeId)
             this.props.onPauseChange(!this.state.changeId)
+        }
+
+        if (this.props.changeId !== prevProps.changeId) {
+            console.log("this.props.changeId !== prevProps.changeId")
+            this.setState({ changeId: this.props.changeId })
         }
     }
 
@@ -227,18 +232,20 @@ class component extends PureComponent {
      * @param index
      * @returns {*}
      */
-    renderTag = (item, index, label) => {
+    renderTag = (item, index, label, inStyle) => {
         const { onLabelChange } = this.props
 
         const { title, key, color = "red", checkFunc, ...others } = label
-        let checked = item[key]
+        let checked = item.labels && item.labels[key]
         if (checkFunc) {
             checked = checkFunc(item)
         }
 
-        let style = {}
+        let style = inStyle || {}
         if (checked) {
             style.backgroundColor = color
+        } else {
+            style.backgroundColor = "lightgray"
         }
 
         return (
@@ -249,12 +256,9 @@ class component extends PureComponent {
                 checked={checked}
                 onChange={mark => {
                     // 数据请求
-                    onLabelChange &&
-                        onLabelChange(item, {
-                            key,
-                            mark,
-                            ...others
-                        })
+                    const labels = { ...item.labels }
+                    labels[key] = mark
+                    this.props.onItemChange({ ...item, labels })
                 }}
             >
                 {title}
@@ -266,19 +270,19 @@ class component extends PureComponent {
      * 渲染头部信息
      * @param {*} item
      */
-    renderInfo(item) {
-        const { playId } = this.props
+    renderInfo(item, index) {
+        const { playId, labels } = this.props
 
         /**
          * 数据修改模型
          */
         let inputProps = {
             showSearch: true,
-            placeholder: "选择用户",
+            placeholder: "选择角色",
             size: "small",
-            style: { width: 120 },
+            style: { width: 100 },
             onChange: value => {
-                onUserChange({
+                this.props.onUserChange({
                     logid: item.id,
                     username: value
                 })
@@ -289,38 +293,43 @@ class component extends PureComponent {
             inputProps.defaultValue = Number.parseInt(item.username)
         }
 
+        // 先要取自要从项目中获取
+        const dict = {}
+        this.props.roles &&
+            this.props.roles.forEach(item => {
+                dict[item.value] = item
+            })
+
         return (
             <Row
                 type="flex"
                 align={"bottom"}
                 gutter={8}
-                style={{ marginBottom: 12 }}
+                style={{ marginTop: 12, marginBottom: 12, fontSize: 14 }}
             >
-                <Fragment>
+                <Col>
                     {this.props.showUserSelect && (
                         <Fragment>
-                            <Col>
+                            {/* <Col>
                                 <Avatar icon="user" />
-                            </Col>
-                            <Col>
-                                {!item.id
-                                    ? "未知用户"
-                                    : createComponent.bind(null)(
-                                          {
-                                              title: "参会人员",
-                                              type: schemaFieldType.MultiSelect,
-                                              dict: {},
-                                              dataIndex: "username",
-                                              required: false
-                                          },
-                                          item,
-                                          inputProps,
-                                          actions.add
-                                      )}
-                            </Col>
+                            </Col> */}
+                            {!item.id
+                                ? "未知用户"
+                                : createComponent.bind(null)(
+                                      {
+                                          title: "参会人员",
+                                          type: schemaFieldType.Select,
+                                          dict,
+                                          dataIndex: "username",
+                                          required: false
+                                      },
+                                      item,
+                                      inputProps,
+                                      actions.add
+                                  )}
                         </Fragment>
                     )}
-                </Fragment>
+                </Col>
                 <Col>
                     {utils.moment.getTimeShow(item.startTime)}
                     {item.endTime &&
@@ -336,8 +345,8 @@ class component extends PureComponent {
                                         : "play-circle"
                                 }
                                 style={{
-                                    marginTop: "8px",
-                                    fontSize: "16px"
+                                    marginTop: "4px",
+                                    fontSize: "14px"
                                 }}
                                 onClick={e => {
                                     this.setState({
@@ -354,7 +363,7 @@ class component extends PureComponent {
                             {playId === item.id && !this.props.pause && (
                                 <Icon
                                     style={{
-                                        fontSize: "16px"
+                                        fontSize: "14px"
                                     }}
                                     type="sync"
                                     spin
@@ -362,6 +371,23 @@ class component extends PureComponent {
                             )}
                         </Col>
                     </Fragment>
+                )}
+                {labels && item.id && (
+                    <Col span={4} style={{ marginLeft: 50 }}>
+                        <h6
+                            style={{
+                                marginRight: 8,
+                                display: "inline",
+                                fontSize: 14
+                            }}
+                        >
+                            标签:
+                        </h6>
+
+                        {labels.map(label =>
+                            this.renderTag(item, index, label, { fontSize: 14 })
+                        )}
+                    </Col>
                 )}
             </Row>
         )
@@ -439,7 +465,7 @@ class component extends PureComponent {
                         changeId: item.id
                     })
                 }}
-                onChange={this.props.onTextChange}
+                onChange={this.props.onItemChange}
             />
         )
     }
@@ -476,7 +502,7 @@ class component extends PureComponent {
                                     padding: "0px 8px 8px 8px"
                                 }}
                             >
-                                {this.renderInfo(item)}
+                                {this.renderInfo(item, index)}
                                 <Row
                                     type="flex"
                                     justify={"space-between"}
@@ -485,13 +511,6 @@ class component extends PureComponent {
                                     <Col span={24}>
                                         {this.renderInput(item)}
                                     </Col>
-                                    {labels && item.id && (
-                                        <Col span={4}>
-                                            {labels.map(label =>
-                                                renderTag(item, index, label)
-                                            )}
-                                        </Col>
-                                    )}
                                 </Row>
                             </Card>
                         </Timeline.Item>
