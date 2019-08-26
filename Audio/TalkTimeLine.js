@@ -235,7 +235,7 @@ class component extends PureComponent {
     renderTag = (item, index, label, inStyle) => {
         const { onLabelChange } = this.props
 
-        const { title, key, color = "red", checkFunc, ...others } = label
+        const { remark, value, color = "red", checkFunc, ...others } = label
         let checked = item.labels && item.labels[key]
         if (checkFunc) {
             checked = checkFunc(item)
@@ -251,7 +251,7 @@ class component extends PureComponent {
         return (
             <CheckableTag
                 style={style}
-                key={key}
+                key={value}
                 color={"red"}
                 checked={checked}
                 onChange={mark => {
@@ -261,7 +261,7 @@ class component extends PureComponent {
                     this.props.onItemChange({ ...item, labels })
                 }}
             >
-                {title}
+                {remark}
             </CheckableTag>
         )
     }
@@ -305,7 +305,7 @@ class component extends PureComponent {
                 type="flex"
                 align={"bottom"}
                 gutter={8}
-                style={{ marginTop: 12, marginBottom: 12, fontSize: 14 }}
+                style={{ marginBottom: 12, fontSize: 14, marginRight: 10 }}
             >
                 <Col>
                     {this.props.showUserSelect && (
@@ -313,24 +313,33 @@ class component extends PureComponent {
                             {/* <Col>
                                 <Avatar icon="user" />
                             </Col> */}
-                            {!item.id
-                                ? "未知用户"
-                                : createComponent.bind(null)(
-                                      {
-                                          title: "参会人员",
-                                          type: schemaFieldType.Select,
-                                          dict,
-                                          dataIndex: "username",
-                                          required: false
-                                      },
-                                      item,
-                                      inputProps,
-                                      actions.add
-                                  )}
+                            {!item.id &&
+                                dict &&
+                                createComponent.bind(null)(
+                                    {
+                                        title: "参会人员",
+                                        type: schemaFieldType.Select,
+                                        dict,
+                                        dataIndex: "username",
+                                        required: false
+                                    },
+                                    item,
+                                    inputProps,
+                                    actions.add
+                                )}
                         </Fragment>
                     )}
                 </Col>
                 <Col>
+                    <h6
+                        style={{
+                            marginRight: 8,
+                            display: "inline",
+                            fontSize: 14
+                        }}
+                    >
+                        时间区间:
+                    </h6>
                     {utils.moment.getTimeShow(item.startTime)}
                     {item.endTime &&
                         " - " + utils.moment.getTimeShow(item.endTime)}
@@ -373,7 +382,7 @@ class component extends PureComponent {
                     </Fragment>
                 )}
                 {labels && item.id && (
-                    <Col span={4} style={{ marginLeft: 50 }}>
+                    <Col span={4} style={{ marginLeft: 20 }}>
                         <h6
                             style={{
                                 marginRight: 8,
@@ -499,7 +508,7 @@ class component extends PureComponent {
                             <Card
                                 bordered={false}
                                 bodyStyle={{
-                                    padding: "0px 8px 8px 8px"
+                                    padding: "8px 8px 8px 8px"
                                 }}
                             >
                                 {this.renderInfo(item, index)}
