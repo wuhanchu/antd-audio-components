@@ -109,6 +109,8 @@ class AudioPlayer extends PureComponent {
         this.keyBindMethods.forEach(({ key, method }) => {
             keyboardJS.unbind(key, method)
         })
+
+        this.wavesurfer && this.wavesurfer.destroy()
     }
 
     componentDidMount() {
@@ -122,7 +124,7 @@ class AudioPlayer extends PureComponent {
             WaveSurfer.create({
                 container,
                 height: 50,
-                hideScrollbar:false,
+                hideScrollbar: false,
                 normalize: true,
                 plugins: [
                     RegionPlugin.create(),
@@ -149,10 +151,6 @@ class AudioPlayer extends PureComponent {
             this.props.dialogue.forEach(item => {
                 this.dialogueMap[item.id] = item
             })
-    }
-
-    componentWillUnmount() {
-        this.wavesurfer && this.wavesurfer.destroy()
     }
 
     setEvents = () => {

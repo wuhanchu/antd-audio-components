@@ -57,6 +57,14 @@ class component extends PureComponent {
         super(props)
         this.setDialogueMap()
         this.bindKey()
+
+        // 先要取自要从项目中获取
+        if (this.props.roles) {
+            this.roleDict = {}
+            this.props.roles.forEach(item => {
+                this.roleDict[item.value] = item
+            })
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -78,9 +86,19 @@ class component extends PureComponent {
         }
 
         if (this.props.changeId !== prevProps.changeId) {
-            console.log("this.props.changeId !== prevProps.changeId")
-            this.setState({ changeId: this.props.changeId })
+            this.setChangeId(this.props.changeId)
         }
+    }
+
+    /**
+     * 修改changeId
+     */
+    setChangeId(changeId,callback) {
+        if (this.state.changeId != changeId) {
+            this.mention.current && this.mention.current.blur()
+        }
+
+        this.setState({ changeId },callback)
     }
 
     /**
@@ -94,7 +112,7 @@ class component extends PureComponent {
         // 退出
         key = "esc"
         method = e => {
-            this.setState({ changeId: null })
+            this.setChangeId(null)
         }
         keyboardJS.bind(key, method)
         keyBindMethods.push({
@@ -121,15 +139,12 @@ class component extends PureComponent {
             }
 
             if (!nextItem) {
-                this.setState({
-                    changeId: null
-                })
+                this.setChangeId(null)
+
                 return
             }
 
-            this.setState({
-                changeId: nextItem.id
-            })
+            this.setChangeId(nextItem.id)
         }
         keyboardJS.bind(key, method)
         keyBindMethods.push({
@@ -151,15 +166,11 @@ class component extends PureComponent {
             const nextItem = this.props.dialogue[nextIndex]
 
             if (!nextItem) {
-                this.setState({
-                    changeId: null
-                })
+                this.setChangeId(changeId)
                 return
             }
 
-            this.setState({
-                changeId: nextItem.id
-            })
+            this.setChangeId(nextItem.id)
         }
         keyboardJS.bind(key, method)
         keyBindMethods.push({
@@ -266,13 +277,7 @@ class component extends PureComponent {
         )
     }
 
-    /**
-     * 渲染头部信息
-     * @param {*} item
-     */
-    renderInfo(item, index) {
-        const { playId, labels } = this.props
-
+    renderUserSelect(item, index) {
         /**
          * 数据修改模型
          */
@@ -284,49 +289,55 @@ class component extends PureComponent {
             onChange: value => {
                 this.props.onUserChange({
                     logid: item.id,
-                    username: value
+                    role: value
                 })
             }
         }
+
+        const component = createComponent.bind(null)(
+            {
+                title: "人员",
+                type: schemaFieldType.Select,
+                dict: this.roleDict,
+                dataIndex: "role"
+            },
+            item,
+            inputProps,
+            actions.add
+        )
+        return component
+    }
+
+    /**
+     * 渲染头部信息
+     * @param {*} item
+     */
+    renderInfo(item, index) {
+        const { playId, labels } = this.props
 
         if (item.username && item.username !== "") {
             inputProps.defaultValue = Number.parseInt(item.username)
         }
 
-        // 先要取自要从项目中获取
-        const dict = {}
-        this.props.roles &&
-            this.props.roles.forEach(item => {
-                dict[item.value] = item
-            })
-
         return (
             <Row
                 type="flex"
-                align={"bottom"}
+                align={"middle"}
                 gutter={8}
-                style={{ marginBottom: 12, fontSize: 14, marginRight: 10 }}
+                style={{
+                    marginBottom: 12,
+                    fontSize: 14,
+                    marginRight: 10
+                }}
             >
-                <Col>
-                    {this.props.showUserSelect && (
+                <Col
+                    style={{
+                        marginRight: 8
+                    }}
+                >
+                    {this.props.showUserSelect && this.roleDict && (
                         <Fragment>
-                            {/* <Col>
-                                <Avatar icon="user" />
-                            </Col> */}
-                            {!item.id &&
-                                dict &&
-                                createComponent.bind(null)(
-                                    {
-                                        title: "参会人员",
-                                        type: schemaFieldType.Select,
-                                        dict,
-                                        dataIndex: "username",
-                                        required: false
-                                    },
-                                    item,
-                                    inputProps,
-                                    actions.add
-                                )}
+                            {item.id && this.renderUserSelect(item, index)}
                         </Fragment>
                     )}
                 </Col>
@@ -358,9 +369,7 @@ class component extends PureComponent {
                                     fontSize: "14px"
                                 }}
                                 onClick={e => {
-                                    this.setState({
-                                        changeId: item.id
-                                    })
+                                    this.setChangeId(item.id)
                                     playId === item.id &&
                                         this.props.onPauseChange(
                                             !this.props.pause
@@ -382,7 +391,7 @@ class component extends PureComponent {
                     </Fragment>
                 )}
                 {labels && item.id && (
-                    <Col span={4} style={{ marginLeft: 20 }}>
+                    <Col style={{ marginLeft: 20 }}>
                         <h6
                             style={{
                                 marginRight: 8,
@@ -417,7 +426,7 @@ class component extends PureComponent {
                 style={{ marginLeft: 12 }}
                 onClick={e => {
                     console.debug("input click", item)
-                    this.setState({ changeId: item.id })
+                    this.setChangeId(item.id)
                     e.stopPropagation()
                     e.preventDefault()
                 }}
@@ -455,6 +464,7 @@ class component extends PureComponent {
                 style={{
                     fontSize: "1.5em"
                 }}
+                ref={this.mention}
                 hotWordList={hotWordList}
                 onBlur={item => {
                     console.debug("onBlur", item)
@@ -470,9 +480,7 @@ class component extends PureComponent {
                 }}
                 onFocus={() => {
                     console.log("onFocus", item)
-                    this.setState({
-                        changeId: item.id
-                    })
+                    this.setChangeId(item.id)
                 }}
                 onChange={this.props.onItemChange}
             />
