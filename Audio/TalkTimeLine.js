@@ -112,6 +112,10 @@ class component extends PureComponent {
         // 退出
         key = "esc"
         method = e => {
+            console.log("esc")
+            e.preventDefault()
+            e.stopPropagation()
+
             this.setChangeId(null)
         }
         keyboardJS.bind(key, method)
