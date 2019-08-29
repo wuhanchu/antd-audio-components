@@ -93,12 +93,12 @@ class component extends PureComponent {
     /**
      * 修改changeId
      */
-    setChangeId(changeId,callback) {
+    setChangeId(changeId, callback) {
         if (this.state.changeId != changeId) {
             this.mention.current && this.mention.current.blur()
         }
 
-        this.setState({ changeId },callback)
+        this.setState({ changeId }, callback)
     }
 
     /**
@@ -193,7 +193,7 @@ class component extends PureComponent {
         // 播放 or 暂停
         key = "space"
         method = e => {
-            if (this.state.changeId) {
+            if (this.props.onItemChange && this.state.changeId) {
                 return
             }
 
@@ -419,7 +419,7 @@ class component extends PureComponent {
         const { changeId } = this.state
         const style = { fontSize: "1.5em" }
 
-        return changeId && changeId === item.id ? (
+        return changeId && changeId === item.id && this.props.onItemChange ? (
             this.renderMentions(item)
         ) : (
             <div
