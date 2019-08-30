@@ -473,15 +473,6 @@ class component extends PureComponent {
                 hotWordList={hotWordList}
                 onBlur={item => {
                     console.debug("onBlur", item)
-                    //
-                    // // !this.onBlurSkip &&
-                    // setTimeout(() => {
-                    //     item &&
-                    //         item.id == this.state.changeId &&
-                    //         this.setState({
-                    //             changeId: null
-                    //         })
-                    // })
                 }}
                 onFocus={() => {
                     console.log("onFocus", item)
