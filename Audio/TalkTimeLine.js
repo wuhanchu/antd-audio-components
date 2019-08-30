@@ -251,7 +251,7 @@ class component extends PureComponent {
         const { onLabelChange } = this.props
 
         const { remark, value, color = "red", checkFunc, ...others } = label
-        let checked = item.labels && item.labels[key]
+        let checked = item.labels && item.labels[value]
         if (checkFunc) {
             checked = checkFunc(item)
         }
@@ -272,7 +272,7 @@ class component extends PureComponent {
                 onChange={mark => {
                     // 数据请求
                     const labels = { ...item.labels }
-                    labels[key] = mark
+                    labels[value] = mark
                     this.props.onItemChange({ ...item, labels })
                 }}
             >
@@ -290,11 +290,8 @@ class component extends PureComponent {
             placeholder: "选择角色",
             size: "small",
             style: { width: 100 },
-            onChange: value => {
-                this.props.onUserChange({
-                    logid: item.id,
-                    role: value
-                })
+            onChange: role => {
+                this.props.onItemChange({ ...item, role })
             }
         }
 
@@ -305,7 +302,7 @@ class component extends PureComponent {
                 dict: this.roleDict,
                 dataIndex: "role"
             },
-            item,
+            item.role,
             inputProps,
             actions.add
         )

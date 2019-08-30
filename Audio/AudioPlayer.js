@@ -136,14 +136,70 @@ class AudioPlayer extends PureComponent {
             })
 
         this.wavesurfer.empty()
+        this.setDialogueMap()
 
         // load the file
         if (this.props.url) {
             this.wavesurfer.load(this.props.url)
+            this.setRegions()
         } else if (this.props.file) {
             this.wavesurfer.loadBlob(this.props.file)
         }
         this.setEvents()
+    }
+
+    componentDidUpdate = (prevProps, prevState) => {
+        // 更新
+        console.log("prevProps", prevProps)
+        if (prevProps.url != this.props.url) {
+            this.wavesurfer.load(this.props.url)
+            this.setRegions()
+        }
+
+        //  播放状态变化
+        if (
+            prevProps.pause !== this.props.pause &&
+            this.state.pause !== this.props.pause
+        ) {
+            if (this.props.pause) {
+                this.wavesurfer.pause()
+            } else if (this.props.changeId) {
+                const region = this.regions[this.props.playId]
+                if (region) {
+                    const currentTime = this.wavesurfer.getCurrentTime()
+                    currentTime >= region.end
+                        ? region.play()
+                        : this.wavesurfer.play(currentTime, region.end)
+                } else {
+                    this.wavesurfer.play()
+                }
+            } else {
+                this.wavesurfer.play()
+            }
+        }
+
+        // 段落变化
+        if (this.props.dialogue !== prevProps.dialogue) {
+            this.setDialogueMap()
+        }
+
+        // 播放位置变化
+        if (
+            this.props.playId != prevProps.playId &&
+            this.props.playId != this.state.playId
+        ) {
+            this.setState(
+                {
+                    playId: this.props.playId
+                },
+                () => {
+                    const region = this.regions[this.props.playId]
+                    if (!this.props.pause && region) {
+                        region.play()
+                    }
+                }
+            )
+        }
     }
 
     setDialogueMap() {
@@ -212,54 +268,6 @@ class AudioPlayer extends PureComponent {
                 color: randomColor(0.1)
             })
         })
-    }
-
-    componentDidUpdate = (prevProps, prevState) => {
-        //  播放状态变化
-        if (
-            prevProps.pause !== this.props.pause &&
-            this.state.pause !== this.props.pause
-        ) {
-            if (this.props.pause) {
-                this.wavesurfer.pause()
-            } else if (this.props.changeId) {
-                const region = this.regions[this.props.playId]
-                if (region) {
-                    const currentTime = this.wavesurfer.getCurrentTime()
-                    currentTime >= region.end
-                        ? region.play()
-                        : this.wavesurfer.play(currentTime, region.end)
-                } else {
-                    this.wavesurfer.play()
-                }
-            } else {
-                this.wavesurfer.play()
-            }
-        }
-
-        // 段落变化
-        if (this.props.dialogue !== prevProps.dialogue) {
-            this.setDialogueMap()
-            this.setRegions()
-        }
-
-        // 播放位置变化
-        if (
-            this.props.playId != prevProps.playId &&
-            this.props.playId != this.state.playId
-        ) {
-            this.setState(
-                {
-                    playId: this.props.playId
-                },
-                () => {
-                    const region = this.regions[this.props.playId]
-                    if (!this.props.pause && region) {
-                        region.play()
-                    }
-                }
-            )
-        }
     }
 
     render() {
