@@ -273,7 +273,8 @@ class component extends PureComponent {
                     // 数据请求
                     const labels = { ...item.labels }
                     labels[value] = mark
-                    this.props.onItemChange({ ...item, labels })
+                    this.props.onItemChange &&
+                        this.props.onItemChange({ ...item, labels })
                 }}
             >
                 {remark}
@@ -285,6 +286,8 @@ class component extends PureComponent {
         /**
          * 数据修改模型
          */
+        const disabled = !this.props.onItemChange
+
         let inputProps = {
             showSearch: true,
             placeholder: "选择角色",
@@ -292,7 +295,8 @@ class component extends PureComponent {
             style: { width: 100 },
             onChange: role => {
                 this.props.onItemChange({ ...item, role })
-            }
+            },
+            disabled
         }
 
         const component = createComponent.bind(null)(
