@@ -251,7 +251,7 @@ class component extends PureComponent {
         const { onLabelChange } = this.props
 
         const { remark, value, color = "red", checkFunc, ...others } = label
-        let checked = item.labels && item.labels[key]
+        let checked = item.labels && item.labels[value]
         if (checkFunc) {
             checked = checkFunc(item)
         }
@@ -272,8 +272,9 @@ class component extends PureComponent {
                 onChange={mark => {
                     // 数据请求
                     const labels = { ...item.labels }
-                    labels[key] = mark
-                    this.props.onItemChange({ ...item, labels })
+                    labels[value] = mark
+                    this.props.onItemChange &&
+                        this.props.onItemChange({ ...item, labels })
                 }}
             >
                 {remark}
@@ -285,17 +286,17 @@ class component extends PureComponent {
         /**
          * 数据修改模型
          */
+        const disabled = !this.props.onItemChange
+
         let inputProps = {
             showSearch: true,
             placeholder: "选择角色",
             size: "small",
             style: { width: 100 },
-            onChange: value => {
-                this.props.onUserChange({
-                    logid: item.id,
-                    role: value
-                })
-            }
+            onChange: role => {
+                this.props.onItemChange({ ...item, role })
+            },
+            disabled
         }
 
         const component = createComponent.bind(null)(
@@ -305,7 +306,7 @@ class component extends PureComponent {
                 dict: this.roleDict,
                 dataIndex: "role"
             },
-            item,
+            item.role,
             inputProps,
             actions.add
         )
@@ -472,15 +473,6 @@ class component extends PureComponent {
                 hotWordList={hotWordList}
                 onBlur={item => {
                     console.debug("onBlur", item)
-                    //
-                    // // !this.onBlurSkip &&
-                    // setTimeout(() => {
-                    //     item &&
-                    //         item.id == this.state.changeId &&
-                    //         this.setState({
-                    //             changeId: null
-                    //         })
-                    // })
                 }}
                 onFocus={() => {
                     console.log("onFocus", item)
