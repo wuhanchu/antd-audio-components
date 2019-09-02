@@ -53,6 +53,9 @@ export default React.memo(
                 return options
             }
 
+            debugger
+            const rows = Math.floor(changeText.length / 50)
+
             return (
                 <Mentions
                     // ref={ref}
@@ -61,14 +64,13 @@ export default React.memo(
                     size={"small"}
                     defaultValue={changeText}
                     onBlur={event => {
-                        console.debug("onBlur event", event)
                         onChange({ ...item, content: changeText }, index)
                         onBlur && onBlur(item)
                     }}
                     onFocus={() => {
                         onFocus && onFocus(item)
                     }}
-                    rows="2"
+                    rows={rows}
                     autoFocus={true}
                     onChange={changeText => setChangeText(changeText)}
                     split={""}
