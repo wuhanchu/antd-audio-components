@@ -183,7 +183,7 @@ class component extends PureComponent {
         })
 
         // 播放 or 暂停
-        key = "ctrl + space"
+        key = "ctrl + alt + space"
         method = e => {
             e.preventDefault()
             this.props.onPauseChange(!this.props.pause)

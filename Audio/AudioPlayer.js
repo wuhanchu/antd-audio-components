@@ -66,7 +66,7 @@ class AudioPlayer extends PureComponent {
         keyboardJS.bind(key, method)
         this.keyBindMethods.push({ key, method })
 
-        key = "ctrl+left"
+        key = "ctrl+alt+left"
         method = e => {
             if (!this.props.changeId) {
                 return
@@ -87,7 +87,7 @@ class AudioPlayer extends PureComponent {
         keyboardJS.bind(key, method)
         this.keyBindMethods.push({ key, method })
 
-        key = "ctrl+right"
+        key = "ctrl+alt+right"
         method = e => {
             if (!this.props.changeId) {
                 return
