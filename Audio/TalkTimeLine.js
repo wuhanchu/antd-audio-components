@@ -13,7 +13,6 @@ import {
 import { antdUtils, frSchema } from "@/outter"
 import InputMentions from "@/components/Extra/Audio/InputMentions"
 import CheckableTag from "antd/es/tag/CheckableTag"
-import "keyboardjs"
 
 const { createComponent } = antdUtils.utils.component
 
