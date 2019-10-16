@@ -11,4 +11,3 @@ export default {
     Recorder,
     wavUtils: { vadCheck: vad_check, getWAV, encodeWAV }
 }
-
