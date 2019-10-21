@@ -2,22 +2,22 @@
 
 ## AudioPlayer 音频波形播放器
 
-封装(wavesurfer.js)[https://github.com/katspaugh/wavesurfer.js] 成react组件。
+封装(wavesurfer.js)[https://github.com/katspaugh/wavesurfer.js] 成 react 组件。
 
 ## TalkTimeLine 对话 和 InputMetions 信息编辑
 
-一个音频中的对话生成对话信息进行显示，InputMetions针对每一句信息进行只能提示编辑。
+一个音频中的对话生成对话信息进行显示，InputMetions 针对每一句信息进行只能提示编辑。
 
 ## 录音 Recorder
 
-在项目(records)[https://github.com/mattdiamond/Recorderjs/blob/master/src/recorder.js]上进行修改，API可进行参考。
+在项目(records)[https://github.com/mattdiamond/Recorderjs/blob/master/src/recorder.js]上进行修改，API 可进行参考。
 
 ### 修改点
 
-重写了recorderjs的代码。
+重写了 recorderjs 的代码。
 
-- 单声道导出
-- 导出16k的音频
+-   单声道导出
+-   导出 16k 的音频
 
 ### 例子
 
