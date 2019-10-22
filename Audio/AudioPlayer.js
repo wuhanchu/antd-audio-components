@@ -228,19 +228,19 @@ class AudioPlayer extends PureComponent {
             console.log("did pause")
 
             this.setState({ pause: true }, () => {
-                this.props.onPauseChange(true)
+                this.props.onPauseChange && this.props.onPauseChange(true)
             })
         })
 
         this.wavesurfer.on("play", () => {
             this.setState({ pause: false }, () => {
-                this.props.onPauseChange(false)
+                this.props.onPauseChange && this.props.onPauseChange(false)
             })
         })
         this.wavesurfer.on("region-in", region => {
             console.log("region-in")
             this.setState({ playId: region.id }, () => {
-                this.props.onPlayChange(region.id)
+                this.props.onPlayChange && this.props.onPlayChange(region.id)
             })
         })
         this.wavesurfer.on("region-out", region => {
@@ -251,14 +251,14 @@ class AudioPlayer extends PureComponent {
         })
         this.wavesurfer.on("region-play", region => {
             this.setState({ pause: false }, () => {
-                this.props.onPauseChange(false)
+                this.props.onPauseChange && this.props.onPauseChange(false)
             })
         })
 
         this.wavesurfer.on("region-click", (region, e) => {
             e.stopPropagation()
             region.play()
-            this.props.onPlayChange(region.id)
+            this.props.onPlayChange && this.props.onPlayChange(region.id)
         })
 
         this.wavesurfer.on("ready", (region, e) => {
