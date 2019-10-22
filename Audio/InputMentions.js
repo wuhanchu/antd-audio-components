@@ -53,7 +53,6 @@ export default React.memo(
                 return options
             }
 
-            debugger
             const rows = Math.floor(changeText.length / 50)
 
             return (

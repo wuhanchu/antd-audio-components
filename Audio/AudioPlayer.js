@@ -1,3 +1,17 @@
+/**
+ * @module 音频波形组件
+ * @param {Array} dialogue 对话数据
+ * @param {String} [url] 音频url，和file二选一
+ *  @param {Blob} [xhr] 认证信息
+ * @param {Blob} [file] 音频文件Blob对象，和url二选一
+ * @param {Number} [playId] 播放ID
+ * @param {Number} [changeId] 修改的数据ID
+ * @param  {Boolean} pause 是否暂停中
+ * @param {Function} [onReady] 音频准备就绪
+ * @param {Function} [onPauseChange] 暂停状态变化
+ * @param {Function} [onPlayChange]  播放ID变化
+ **/
+
 import React, { PureComponent, useEffect, useState, Fragment } from "react"
 import WaveSurfer from "wavesurfer.js"
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min.js"
@@ -7,6 +21,11 @@ import { Col, Row, Button } from "antd"
 
 /**
  * Random RGBA color.
+ */
+
+/**
+ * 生成一个随机颜色
+ * @param {Number} alpha 透明度
  */
 function randomColor(alpha) {
     return (
@@ -21,9 +40,6 @@ function randomColor(alpha) {
     )
 }
 
-/**
- *  onReady 音频准备好
- */
 class AudioPlayer extends PureComponent {
     regions = {}
     dialogueMap = {}
@@ -115,7 +131,6 @@ class AudioPlayer extends PureComponent {
     componentDidMount() {
         let wavesurfer = null
         const container = document.querySelector("#waveform")
-        console.debug("this.props.xhr", this.props.xhr)
 
         //  create element
         this.wavesurfer =
@@ -257,16 +272,17 @@ class AudioPlayer extends PureComponent {
     setRegions = () => {
         const { dialogue } = this.props
         this.wavesurfer.clearRegions()
-        dialogue.forEach(item => {
-            this.regions[item.id] = this.wavesurfer.addRegion({
-                id: item.id,
-                drag: false,
-                resize: false,
-                start: item.startTime / 1000,
-                end: item.endTime / 1000,
-                color: randomColor(0.1)
+        dialogue &&
+            dialogue.forEach(item => {
+                this.regions[item.id] = this.wavesurfer.addRegion({
+                    id: item.id,
+                    drag: false,
+                    resize: false,
+                    start: item.startTime / 1000,
+                    end: item.endTime / 1000,
+                    color: randomColor(0.1)
+                })
             })
-        })
     }
 
     render() {
