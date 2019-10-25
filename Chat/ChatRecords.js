@@ -59,11 +59,14 @@ const CommentMy = styled(CommentBase)`
     & .ant-comment-avatar {
         margin-left: 12px;
     }
+    & .ant-comment-content-detail {
+        margin: auto 0 auto auto;
+
+    }
     & .ant-comment-inner {
         flex-direction: row-reverse;
     }
-    & .ant-comment-actions {
-    }
+
 `
 
 function ChatRecords({ value, iconMy, iconInterlocutors }) {
