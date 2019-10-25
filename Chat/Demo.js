@@ -23,8 +23,8 @@ function Demo(props) {
                                 globalValue.length % 2 == 1
                                     ? "my"
                                     : "interlocutors", // or interlocutors
-                            content: "tes12312311231231231231231233t",
-                            actions: globalValue.length % 2 == 1 ? "test" : null // or node]
+                            content: "tes12312311231212331231231231231231231231231231233ttes12312311231212331231231231231231231231231231233t",
+                            actions: globalValue.length % 2 == 1 ? "test" : "n123123" // or node]
                         }
                     ])
                 )

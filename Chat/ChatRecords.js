@@ -12,7 +12,7 @@
  **/
 
 import React, { useEffect } from "react"
-import { Comment, List } from "antd"
+import { Comment, List, Card } from "antd"
 import moment from "moment"
 import styled from "styled-components"
 import * as lodash from "lodash"
@@ -20,7 +20,6 @@ import * as lodash from "lodash"
 import style from "../style"
 
 const CommentBase = styled(Comment)`
-    width: fit-content;
     & .ant-comment-content-detail {
         border-radius: 5px;
         background: ${style.colors.background.gray};
@@ -38,10 +37,15 @@ const CommentBase = styled(Comment)`
         padding-right: 0px;
         color: ${style.colors.text.blue};
     }
+
+    & span {
+        word-wrap: break-word;
+        word-break: break-all;
+    }
 `
 
 const CommentClient = styled(CommentBase)`
-    padding-right: 100px;
+    padding-right: 40%;
     & .ant-comment-actions {
         float: left;
     }
@@ -51,13 +55,14 @@ const CommentClient = styled(CommentBase)`
  * my comment
  */
 const CommentMy = styled(CommentBase)`
-    float: right;
-    padding-left: 100px;
+    padding-left: 40%;
+    & .ant-comment-avatar {
+        margin-left: 12px;
+    }
     & .ant-comment-inner {
         flex-direction: row-reverse;
     }
     & .ant-comment-actions {
-        float: right;
     }
 `
 
@@ -105,7 +110,7 @@ function ChatRecords({ value, iconMy, iconInterlocutors }) {
             dataSource={data}
             renderItem={item => (
                 <li>
-                    <div style={{ height: item.actions ? "80px" : "60px" }}>
+                    <div>
                         {item.role == "my" ? (
                             <CommentMy
                                 id={"chat_" + item.id}
