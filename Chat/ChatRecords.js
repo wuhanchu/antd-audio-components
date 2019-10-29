@@ -81,7 +81,7 @@ const CommentMy = styled(CommentBase)`
 
 `
 
-function ChatRecords({value, iconMy, status, iconInterlocutors}) {
+function ChatRecords({value, iconMy, status, iconInterlocutors, goingTip}) {
     const data = value.map(item => ({
         ...item,
         avatar:
@@ -148,7 +148,7 @@ function ChatRecords({value, iconMy, status, iconInterlocutors}) {
                     </li>
                 )}
             />
-            <Spin spinning={status == STATUS.ongoing}>
+            <Spin spinning={status == STATUS.ongoing} tip={goingTip}>
                 <Comment>
 
                 </Comment>
