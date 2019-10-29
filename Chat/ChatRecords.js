@@ -1,5 +1,5 @@
 /**
- * @module 聊天记录
+ * @module 聊天记录组件
  * @param {Array} value 对话数据
  * {
  *       id: 1,
@@ -9,20 +9,32 @@
  *   }
  * @param {Node} iconMy 本人头像
  * @param {Node} iconInterlocutors 对话人头像
+ * @param {string}
  **/
 
-import React, { useEffect } from "react"
-import { Comment, List, Card } from "antd"
-import moment from "moment"
+import React, {Fragment, useEffect} from "react"
+import {Col, Comment, List, Row, Spin, Typography} from "antd"
 import styled from "styled-components"
 import * as lodash from "lodash"
-
 import style from "../style"
+
+/**
+ * the Chat state
+ * default suspend
+ * @enum
+ */
+export const STATUS = {
+    ongoing: "ongoing",
+    suspend: "suspend"
+}
+
+const {Text} = Typography;
+
 
 const CommentBase = styled(Comment)`
     & .ant-comment-content-detail {
         border-radius: 5px;
-        background: ${style.colors.background.gray};
+        background: ${style.colors.background.gray};  
         padding: 10px;
         width: fit-content;
     }
@@ -69,7 +81,7 @@ const CommentMy = styled(CommentBase)`
 
 `
 
-function ChatRecords({ value, iconMy, iconInterlocutors }) {
+function ChatRecords({value, iconMy, status, iconInterlocutors}) {
     const data = value.map(item => ({
         ...item,
         avatar:
@@ -91,7 +103,7 @@ function ChatRecords({ value, iconMy, iconInterlocutors }) {
      * 滚动到对应的位置
      * @param item
      */
-    const scrollToItem = function(item) {
+    const scrollToItem = function (item) {
         if (!item) {
             return
         }
@@ -108,33 +120,40 @@ function ChatRecords({ value, iconMy, iconInterlocutors }) {
     }, [value])
 
     return (
-        <List
-            itemLayout="horizontal"
-            dataSource={data}
-            renderItem={item => (
-                <li>
-                    <div>
-                        {item.role == "my" ? (
-                            <CommentMy
-                                id={"chat_" + item.id}
-                                key={item.id}
-                                actions={item.actions}
-                                avatar={item.avatar}
-                                content={item.content}
-                            />
-                        ) : (
-                            <CommentClient
-                                id={"chat_" + item.id}
-                                key={item.id}
-                                actions={item.actions}
-                                avatar={item.avatar}
-                                content={item.content}
-                            />
-                        )}
-                    </div>
-                </li>
-            )}
-        />
+        <Fragment>
+            <List
+                itemLayout="horizontal"
+                dataSource={data}
+                renderItem={item => (
+                    <li>
+                        <div>
+                            {item.role == "my" ? (
+                                <CommentMy
+                                    id={"chat_" + item.id}
+                                    key={item.id}
+                                    actions={item.actions}
+                                    avatar={item.avatar}
+                                    content={item.content}
+                                />
+                            ) : (
+                                <CommentClient
+                                    id={"chat_" + item.id}
+                                    key={item.id}
+                                    actions={item.actions}
+                                    avatar={item.avatar}
+                                    content={item.content}
+                                />
+                            )}
+                        </div>
+                    </li>
+                )}
+            />
+            <Spin spinning={status == STATUS.ongoing}>
+                <Comment>
+
+                </Comment>
+            </Spin>
+        </Fragment>
     )
 }
 
