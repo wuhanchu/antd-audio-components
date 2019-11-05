@@ -107,15 +107,13 @@ class TalkTimeLine extends PureComponent {
         }
 
         // changeId 正式
-        if (this.state.changeId !== prevState.changeId) {
+        if (this.props.changeId !== prevProps.changeId) {
+            this.setChangeId(this.props.changeId)
+        } else if (this.state.changeId !== prevState.changeId) {
             this.props.onChangeIdChange &&
                 this.props.onChangeIdChange(this.state.changeId)
             this.props.onPauseChange &&
                 this.props.onPauseChange(!this.state.changeId)
-        }
-
-        if (this.props.changeId !== prevProps.changeId) {
-            this.setChangeId(this.props.changeId)
         }
     }
 
