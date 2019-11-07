@@ -53,7 +53,7 @@ export default React.memo(
                 return options
             }
 
-            const rows = Math.floor(changeText.length / 50)
+            const rows = Math.ceil(changeText.length / 75)
 
             return (
                 <Mentions
