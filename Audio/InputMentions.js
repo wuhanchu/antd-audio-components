@@ -78,7 +78,7 @@ export default React.memo(
             }
             // debugger
             // const rows = Math.floor(changeText.length / 50)
-            let wrapperWidth = (document.body.clientWidth * 0.9 - 121) + "px"
+            let wrapperWidth = (document.body.clientWidth * 0.9 - 121.5) + "px"
             let normalHeight =  textSize("1.5em", "",changeText, wrapperWidth, "normal").height
             let nowrapHeight = textSize("1.5em", "",changeText, document.body.clientWidth, "nowrap").height
             const rows = normalHeight/nowrapHeight
