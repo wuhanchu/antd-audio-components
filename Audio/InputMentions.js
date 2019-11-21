@@ -5,6 +5,30 @@ import { Mentions } from "antd"
 /**
  * 输入提示
  */
+
+function textSize(fontSize,fontFamily,text, wrapperWidth, whiteSpace){
+    var span = document.createElement("div");
+    var result = {};
+    result.width = span.offsetWidth;
+    result.height = span.offsetHeight;
+    span.style.visibility = "hidden";
+    span.style.fontSize = fontSize;
+    span.style.fontFamily = fontFamily;
+    span.style.width= wrapperWidth;
+    span.style.display = "inline-block";
+    span.style.whiteSpace= whiteSpace;
+    document.body.appendChild(span);
+    if(typeof span.textContent != "undefined"){
+        span.textContent = text;
+    }else{
+        span.innerText = text;
+    }
+    result.width = parseFloat(window.getComputedStyle(span).width) - result.width;
+    result.height = parseFloat(window.getComputedStyle(span).height) - result.height;
+
+    return result;
+  }
+
 export default React.memo(
     React.forwardRef(
         (
@@ -52,9 +76,12 @@ export default React.memo(
                     })
                 return options
             }
-
-            const rows = Math.ceil(changeText.length / 75)
-
+            // debugger
+            // const rows = Math.floor(changeText.length / 50)
+            let wrapperWidth = (document.body.clientWidth * 0.9 - 121) + "px"
+            let normalHeight =  textSize("1.5em", "",changeText, wrapperWidth, "normal").height
+            let nowrapHeight = textSize("1.5em", "",changeText, document.body.clientWidth, "nowrap").height
+            const rows = normalHeight/nowrapHeight
             return (
                 <Mentions
                     // ref={ref}
