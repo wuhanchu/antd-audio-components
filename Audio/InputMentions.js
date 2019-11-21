@@ -76,7 +76,6 @@ export default React.memo(
                     })
                 return options
             }
-
             // debugger
             // const rows = Math.floor(changeText.length / 50)
             let wrapperWidth = (document.body.clientWidth * 0.9 - 112) + "px"

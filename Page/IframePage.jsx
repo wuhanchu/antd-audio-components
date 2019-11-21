@@ -14,7 +14,6 @@ class IframePage extends PureComponent {
     }
 
     render() {
-
         return (
             <iframe
                 style={{

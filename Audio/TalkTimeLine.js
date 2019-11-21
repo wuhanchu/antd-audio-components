@@ -13,7 +13,6 @@ import {
 import { antdUtils, frSchema } from "@/outter"
 import InputMentions from "@/components/Extra/Audio/InputMentions"
 import CheckableTag from "antd/es/tag/CheckableTag"
-import "keyboardjs"
 
 const { createComponent } = antdUtils.utils.component
 
@@ -22,35 +21,64 @@ const { actions, schemaFieldType, utils } = frSchema
 const { Text } = Typography
 const { Option } = Mentions
 
-//对话类型
+/**
+ *对话类型
+ */
 export const RECORD_TYPE = {
     sign: "sign",
     record: "record"
 }
 
 /**
- *   dialogue, // 对话数据
- hotWordList, // 热词
- labels, // 标签
- playId, //当前播放的id
- running, //开启录音标志
- pause, // 播放暂停标志
- showUserSelect, // 是否开启用户选择
- reverse, // 是否反转显示数据
- onItemChange, //对话修改
- onUserChange, //对话修改
- onLabelChange, // 标志修改
- onPlayChange // playid 修改
- */
-class component extends PureComponent {
+ * @class TalkTimeLine
+ * @classdesc default export, if have not event just use InputMentions
+ * @param {Array} dialogue  对话数据
+ *              {
+ *                   id: 1,
+ *                   type: "record",
+ *                   startTime: moment(),
+ *                   endTime: moment(),
+ *                   content: "test"
+ *               }
+ * @param {Array} [null] hotWordList 热词
+ * @param {Array}  [null] labels 标签
+ * @param {Integer} [null] playId 当前播放的id
+ * @param {Boolean}  [flse] running 组件运行状态（是否录音或者播放中）
+ * @param {Boolean}  [true] pause 播放暂停标志
+ * @param {Boolean}  [false] showUserSelect 是否开启用户选择
+ * @param {Boolean}  [false] reverse 是否反转显示数据
+ * @param {Function} [null] onItemChange 对话修改
+ * @param {Function} [null]  onUserChange 用户修改
+ * @param {Function} [null]  onLabelChange 标签修改
+ * @param {Function} [null] onPlayChange playid 修改
+ * @param {Boolen} [false] hideInfo 显示每句对话的相关信息
+ **/
+class TalkTimeLine extends PureComponent {
+    /**
+     * @property {object}
+     * @desc react object of mention
+     */
     mention = React.createRef()
+
+    /**
+     * @property {Array}
+     * @desc 按键绑定
+     */
     keyBindMethods = []
 
+    /**
+     * @property {object}
+     * @desc state
+     */
     state = {
         changeId: null // 当前修改ID
         // playId: null // 当前播放ID
     }
 
+    /**
+     * @property {object}
+     * @desc 对话map
+     */
     dialogueMap = {}
 
     constructor(props) {
@@ -79,19 +107,20 @@ class component extends PureComponent {
         }
 
         // changeId 正式
-        if (this.state.changeId !== prevState.changeId) {
-            this.props.onChangeIdChange &&
-                this.props.onChangeIdChange(this.state.changeId)
-            this.props.onPauseChange(!this.state.changeId)
-        }
-
         if (this.props.changeId !== prevProps.changeId) {
             this.setChangeId(this.props.changeId)
+        } else if (this.state.changeId !== prevState.changeId) {
+            this.props.onChangeIdChange &&
+                this.props.onChangeIdChange(this.state.changeId)
+            this.props.onPauseChange &&
+                this.props.onPauseChange(!this.state.changeId)
         }
     }
 
     /**
      * 修改changeId
+     * @param {*} changeId 修改的项目ID
+     * @param {*} callback 回调函数
      */
     setChangeId(changeId, callback) {
         if (this.state.changeId != changeId) {
@@ -318,7 +347,11 @@ class component extends PureComponent {
      * @param {*} item
      */
     renderInfo(item, index) {
-        const { playId, labels } = this.props
+        const { playId, labels, hideInfo } = this.props
+
+        if (hideInfo) {
+            return null
+        }
 
         if (item.username && item.username !== "") {
             inputProps.defaultValue = Number.parseInt(item.username)
@@ -346,21 +379,23 @@ class component extends PureComponent {
                         </Fragment>
                     )}
                 </Col>
-                <Col>
-                    <h6
-                        style={{
-                            marginRight: 8,
-                            display: "inline",
-                            fontSize: 14
-                        }}
-                    >
-                        时间区间:
-                    </h6>
-                    {utils.moment.getTimeShow(item.startTime)}
-                    {item.endTime &&
-                        " - " + utils.moment.getTimeShow(item.endTime)}
-                </Col>
-                {item.id && (
+                {item.startTime && (
+                    <Col>
+                        <h6
+                            style={{
+                                marginRight: 8,
+                                display: "inline",
+                                fontSize: 14
+                            }}
+                        >
+                            时间区间:
+                        </h6>
+                        {utils.moment.getTimeShow(item.startTime)}
+                        {item.endTime &&
+                            " - " + utils.moment.getTimeShow(item.endTime)}
+                    </Col>
+                )}
+                {item.id && item.startTime && (
                     <Fragment>
                         <Col>
                             <Icon
@@ -535,4 +570,4 @@ class component extends PureComponent {
     }
 }
 
-export default component
+export default TalkTimeLine
