@@ -147,7 +147,6 @@ class TalkTimeLine extends PureComponent {
             }
         }
 
-        // todo
 
         node.onclick = event => {
             if (
