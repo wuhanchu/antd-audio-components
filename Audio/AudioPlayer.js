@@ -12,12 +12,12 @@
  * @param {Function} [onPlayChange]  播放ID变化
  **/
 
-import React, { PureComponent, useEffect, useState, Fragment } from "react"
+import { Button, Col, Row } from "antd"
+import React, { Fragment, PureComponent } from "react"
 import WaveSurfer from "wavesurfer.js"
-import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min.js"
-import MinimapPlugin from "wavesurfer.js/dist/plugin/wavesurfer.minimap.min.js"
 import RegionPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min.js"
-import { Col, Row, Button } from "antd"
+import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min.js"
+import * as lodash from "lodash"
 
 /**
  * Random RGBA color.
@@ -26,6 +26,7 @@ import { Col, Row, Button } from "antd"
 /**
  * 生成一个随机颜色
  * @param {Number} alpha 透明度
+ * @param {ReactNode} operationExtend extend operation buttons
  */
 function randomColor(alpha) {
     return (
@@ -55,13 +56,16 @@ class AudioPlayer extends PureComponent {
         this.bindKey()
     }
 
+    /**
+     * bind the shortcuts to  audio
+     */
     bindKey() {
         let method = null
         let key = null
 
         key = "left"
         method = e => {
-            if (this.props.changeId) {
+            if (!lodash.isNull(this.props.changeId)) {
                 return
             }
             e.preventDefault()
@@ -72,7 +76,7 @@ class AudioPlayer extends PureComponent {
 
         key = "right"
         method = e => {
-            if (this.props.changeId) {
+            if (!lodash.isNull(this.props.changeId)) {
                 return
             }
             e.preventDefault()
@@ -81,9 +85,9 @@ class AudioPlayer extends PureComponent {
         keyboardJS.bind(key, method)
         this.keyBindMethods.push({ key, method })
 
-        key = "ctrl+alt+left"
+        key = "shift+alt+left"
         method = e => {
-            if (!this.props.changeId) {
+            if (lodash.isNull(this.props.changeId)) {
                 return
             }
             e.preventDefault()
@@ -102,9 +106,9 @@ class AudioPlayer extends PureComponent {
         keyboardJS.bind(key, method)
         this.keyBindMethods.push({ key, method })
 
-        key = "ctrl+alt+right"
+        key = "shift+alt+right"
         method = e => {
-            if (!this.props.changeId) {
+            if (lodash.isNull(this.props.changeId)) {
                 return
             }
             e.preventDefault()
@@ -139,6 +143,8 @@ class AudioPlayer extends PureComponent {
                 container,
                 height: 50,
                 hideScrollbar: false,
+                minPxPerSec: 30,
+                scrollParent: true,
                 normalize: true,
                 plugins: [
                     RegionPlugin.create(),
@@ -148,6 +154,7 @@ class AudioPlayer extends PureComponent {
                 ],
                 xhr: { ...this.props.xhr }
             })
+        document.wavesurfer = this.wavesurfer
 
         this.wavesurfer.empty()
         this.setDialogueMap()
@@ -159,12 +166,13 @@ class AudioPlayer extends PureComponent {
         } else if (this.props.file) {
             this.wavesurfer.loadBlob(this.props.file)
         }
+
+        // set the wavefile event
         this.setEvents()
     }
 
     componentDidUpdate = (prevProps, prevState) => {
         // 更新
-        console.log("prevProps", prevProps)
         if (prevProps.url != this.props.url) {
             this.wavesurfer.load(this.props.url)
             this.setRegions()
@@ -177,7 +185,7 @@ class AudioPlayer extends PureComponent {
         ) {
             if (this.props.pause) {
                 this.wavesurfer.pause()
-            } else if (this.props.changeId) {
+            } else if (!lodash.isNull(this.props.changeId)) {
                 const region = this.regions[this.props.playId]
                 if (region) {
                     const currentTime = this.wavesurfer.getCurrentTime()
@@ -195,6 +203,14 @@ class AudioPlayer extends PureComponent {
         // 段落变化
         if (this.props.dialogue !== prevProps.dialogue) {
             this.setDialogueMap()
+
+            if (
+                this.props.dialogue &&
+                prevProps.dialogue &&
+                this.props.dialogue.length !== prevProps.dialogue.length
+            ) {
+                this.setRegions()
+            }
         }
 
         // 播放位置变化
@@ -256,7 +272,6 @@ class AudioPlayer extends PureComponent {
         })
 
         this.wavesurfer.on("region-click", (region, e) => {
-            e.stopPropagation()
             region.play()
             this.props.onPlayChange && this.props.onPlayChange(region.id)
         })
@@ -291,7 +306,12 @@ class AudioPlayer extends PureComponent {
             <Fragment>
                 <div id="wave-timeline"></div>
                 <div id="waveform" />
-                <Row gutter={8} type={"flex"} style={{ marginTop: 8 }}>
+                <Row
+                    gutter={8}
+                    type={"flex"}
+                    justify="space-between"
+                    style={{ marginTop: 8 }}
+                >
                     <Col>
                         {pause ? (
                             <Button
@@ -317,6 +337,9 @@ class AudioPlayer extends PureComponent {
                             </Button>
                         )}
                     </Col>
+                    {this.props.operationExtend && (
+                        <Col>{this.props.operationExtend}</Col>
+                    )}
                 </Row>
             </Fragment>
         )

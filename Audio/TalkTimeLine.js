@@ -8,11 +8,16 @@ import {
     Row,
     Spin,
     Timeline,
-    Typography
+    Typography,
+    message
 } from "antd"
 import { antdUtils, frSchema } from "@/outter"
 import InputMentions from "@/components/Extra/Audio/InputMentions"
 import CheckableTag from "antd/es/tag/CheckableTag"
+import ButtonSpace from "@/components/Extra/Button/ButtonSpace"
+import clone from "clone"
+import * as lodash from "lodash"
+import Immutable from "seamless-immutable"
 
 const { createComponent } = antdUtils.utils.component
 
@@ -32,7 +37,7 @@ export const RECORD_TYPE = {
 /**
  * @class TalkTimeLine
  * @classdesc default export, if have not event just use InputMentions
- * @param {Array} dialogue  对话数据
+ * @param {Array} dialogue  对话数据 is Immutable
  *              {
  *                   id: 1,
  *                   type: "record",
@@ -48,8 +53,6 @@ export const RECORD_TYPE = {
  * @param {Boolean}  [false] showUserSelect 是否开启用户选择
  * @param {Boolean}  [false] reverse 是否反转显示数据
  * @param {Function} [null] onItemChange 对话修改
- * @param {Function} [null]  onUserChange 用户修改
- * @param {Function} [null]  onLabelChange 标签修改
  * @param {Function} [null] onPlayChange playid 修改
  * @param {Boolen} [false] hideInfo 显示每句对话的相关信息
  **/
@@ -72,7 +75,6 @@ class TalkTimeLine extends PureComponent {
      */
     state = {
         changeId: null // 当前修改ID
-        // playId: null // 当前播放ID
     }
 
     /**
@@ -84,7 +86,6 @@ class TalkTimeLine extends PureComponent {
     constructor(props) {
         super(props)
         this.setDialogueMap()
-        this.bindKey()
 
         // 先要取自要从项目中获取
         if (this.props.roles) {
@@ -95,10 +96,14 @@ class TalkTimeLine extends PureComponent {
         }
     }
 
+    componentDidMount() {
+        this.bindKey()
+    }
+
     componentDidUpdate(prevProps, prevState) {
         // play 切换
         if (this.props.playId !== prevProps.playId) {
-            this.props.playId &&
+            !lodash.isNull(this.props.playId) &&
                 this.scrollToItem(this.dialogueMap[this.props.playId].item)
         }
 
@@ -113,7 +118,7 @@ class TalkTimeLine extends PureComponent {
             this.props.onChangeIdChange &&
                 this.props.onChangeIdChange(this.state.changeId)
             this.props.onPauseChange &&
-                this.props.onPauseChange(!this.state.changeId)
+                this.props.onPauseChange(lodash.isNull(this.state.changeId))
         }
     }
 
@@ -134,6 +139,27 @@ class TalkTimeLine extends PureComponent {
      * 绑定按键
      */
     bindKey = () => {
+        // rewrite the key event ,not to triger input
+        const node = document.getElementById("timeline")
+        node.onkeypress = event => {
+            if (event.shiftKey && event.altKey) {
+                return false
+            }
+        }
+
+        // todo
+
+        node.onclick = event => {
+            if (
+                event.target.className &&
+                event.target.className.indexOf &&
+                event.target.className.indexOf("flex") > -1
+            ) {
+                this.setChangeId(null)
+            }
+        }
+
+        // set the event
         let { keyBindMethods } = this
         let method = null
         let key = null
@@ -211,8 +237,8 @@ class TalkTimeLine extends PureComponent {
             method
         })
 
-        // 播放 or 暂停
-        key = "ctrl + alt + space"
+        // play or suspend
+        key = "shift + alt + space"
         method = e => {
             e.preventDefault()
             this.props.onPauseChange(!this.props.pause)
@@ -223,7 +249,7 @@ class TalkTimeLine extends PureComponent {
             method
         })
 
-        // 播放 or 暂停
+        // Without editing, play or suspend
         key = "space"
         method = e => {
             if (this.props.onItemChange && this.state.changeId) {
@@ -345,8 +371,10 @@ class TalkTimeLine extends PureComponent {
     /**
      * 渲染头部信息
      * @param {*} item
+     * @param index item idnex
+     * @param isLast is last item
      */
-    renderInfo(item, index) {
+    renderInfo(item, index, isLast = false) {
         const { playId, labels, hideInfo } = this.props
 
         if (hideInfo) {
@@ -358,93 +386,212 @@ class TalkTimeLine extends PureComponent {
         }
 
         return (
-            <Row
-                type="flex"
-                align={"middle"}
-                gutter={8}
-                style={{
-                    marginBottom: 12,
-                    fontSize: 14,
-                    marginRight: 10
-                }}
-            >
-                <Col
-                    style={{
-                        marginRight: 8
-                    }}
-                >
-                    {this.props.showUserSelect && this.roleDict && (
-                        <Fragment>
-                            {item.id && this.renderUserSelect(item, index)}
-                        </Fragment>
-                    )}
-                </Col>
-                {item.startTime && (
-                    <Col>
-                        <h6
+            <Row type="flex" align={"space-between"}>
+                <Col>
+                    <Row
+                        type="flex"
+                        align={"middle"}
+                        gutter={8}
+                        style={{
+                            marginBottom: 12,
+                            fontSize: 14,
+                            marginRight: 10
+                        }}
+                    >
+                        <Col
                             style={{
-                                marginRight: 8,
-                                display: "inline",
-                                fontSize: 14
+                                marginRight: 8
                             }}
                         >
-                            时间区间:
-                        </h6>
-                        {utils.moment.getTimeShow(item.startTime)}
-                        {item.endTime &&
-                            " - " + utils.moment.getTimeShow(item.endTime)}
-                    </Col>
-                )}
-                {item.id && item.startTime && (
-                    <Fragment>
-                        <Col>
-                            <Icon
-                                type={
-                                    playId === item.id && !this.props.pause
-                                        ? "stop"
-                                        : "play-circle"
-                                }
-                                style={{
-                                    marginTop: "4px",
-                                    fontSize: "14px"
-                                }}
-                                onClick={e => {
-                                    this.setChangeId(item.id)
-                                    playId === item.id &&
-                                        this.props.onPauseChange(
-                                            !this.props.pause
-                                        )
-                                }}
-                            />
-                        </Col>
-                        <Col>
-                            {playId === item.id && !this.props.pause && (
-                                <Icon
-                                    style={{
-                                        fontSize: "14px"
-                                    }}
-                                    type="sync"
-                                    spin
-                                />
+                            {this.props.showUserSelect && this.roleDict && (
+                                <Fragment>
+                                    {!lodash.isNull(item.id) &&
+                                        this.renderUserSelect(item, index)}
+                                </Fragment>
                             )}
                         </Col>
-                    </Fragment>
-                )}
-                {labels && item.id && (
-                    <Col style={{ marginLeft: 20 }}>
-                        <h6
-                            style={{
-                                marginRight: 8,
-                                display: "inline",
-                                fontSize: 14
-                            }}
-                        >
-                            标签:
-                        </h6>
-
-                        {labels.map(label =>
-                            this.renderTag(item, index, label, { fontSize: 14 })
+                        {!lodash.isNull(item.startTime) && (
+                            <Col>
+                                <h6
+                                    style={{
+                                        marginRight: 8,
+                                        display: "inline",
+                                        fontSize: 14
+                                    }}
+                                >
+                                    时间区间:
+                                </h6>
+                                {utils.moment.getTimeShow(item.startTime)}
+                                {!lodash.isNull(item.endTime) &&
+                                    " - " +
+                                        utils.moment.getTimeShow(item.endTime)}
+                            </Col>
                         )}
+                        {!lodash.isNull(item.id) &&
+                            !lodash.isNull(item.startTime) && (
+                                <Fragment>
+                                    <Col>
+                                        <Icon
+                                            type={
+                                                playId === item.id &&
+                                                !this.props.pause
+                                                    ? "stop"
+                                                    : "play-circle"
+                                            }
+                                            style={{
+                                                marginTop: "4px",
+                                                fontSize: "14px"
+                                            }}
+                                            onClick={e => {
+                                                this.setChangeId(item.id)
+                                                playId === item.id &&
+                                                    this.props.onPauseChange(
+                                                        !this.props.pause
+                                                    )
+                                            }}
+                                        />
+                                    </Col>
+                                    <Col>
+                                        {playId === item.id &&
+                                            !this.props.pause && (
+                                                <Icon
+                                                    style={{
+                                                        fontSize: "14px"
+                                                    }}
+                                                    type="sync"
+                                                    spin
+                                                />
+                                            )}
+                                    </Col>
+                                </Fragment>
+                            )}
+                        {!lodash.isEmpty(labels) && !lodash.isNull(item.id) && (
+                            <Col style={{ marginLeft: 20 }}>
+                                <h6
+                                    style={{
+                                        marginRight: 8,
+                                        display: "inline",
+                                        fontSize: 14
+                                    }}
+                                >
+                                    标签:
+                                </h6>
+
+                                {labels.map(label =>
+                                    this.renderTag(item, index, label, {
+                                        fontSize: 14
+                                    })
+                                )}
+                            </Col>
+                        )}
+                    </Row>
+                </Col>
+                {this.props.onItemChange && (
+                    <Col>
+                        <Fragment>
+                            {index != 0 && (
+                                <ButtonSpace
+                                    size="small"
+                                    onClick={() => {
+                                        const { dialogue } = this.props
+                                        let tempDialogue = clone(dialogue)
+                                        let lastItem = tempDialogue[index - 1]
+                                        lastItem.endTime = item.endTime
+                                        lastItem.content =
+                                            lastItem.content + item.content
+
+                                        tempDialogue.splice(index, 1)
+
+                                        this.setChangeId(null, () =>
+                                            this.props.onDialogueChange(
+                                                tempDialogue
+                                            )
+                                        )
+                                    }}
+                                >
+                                    合并至上一段
+                                </ButtonSpace>
+                            )}
+                            {!isLast && (
+                                <ButtonSpace
+                                    size="small"
+                                    onClick={() => {
+                                        const { dialogue } = this.props
+                                        let tempDialogue = clone(dialogue)
+                                        let nextItem = tempDialogue[index + 1]
+                                        if (lodash.isNull(nextItem)) {
+                                            return
+                                        }
+                                        nextItem.startTime = item.startTime
+                                        nextItem.content =
+                                            item.content + nextItem.content
+                                        tempDialogue.splice(index, 1)
+                                        this.setChangeId(null, () => {
+                                            this.props.onDialogueChange(
+                                                tempDialogue
+                                            )
+                                        })
+                                    }}
+                                >
+                                    合并至下一段
+                                </ButtonSpace>
+                            )}
+                            {this.props.pause &&
+                                this.state.changeId == item.id && (
+                                    <ButtonSpace
+                                        size="small"
+                                        onClick={() => {
+                                            const { dialogue } = this.props
+
+                                            let tempDialogue = clone(dialogue)
+                                            const item = tempDialogue[index]
+
+                                            const selectText = document
+                                                .getSelection()
+                                                .toString()
+
+                                            // get currentTime to be next item begin time
+                                            const startTime =
+                                                document.wavesurfer.getCurrentTime() *
+                                                1000
+
+                                            if (
+                                                item.endTime - startTime <
+                                                3000
+                                            ) {
+                                                message.warn("拆分间隔太短！")
+                                                return
+                                            }
+
+                                            tempDialogue.splice(index + 1, 0, {
+                                                ...item,
+                                                id: startTime,
+                                                startTime,
+                                                entTime: item.endTime,
+                                                content: selectText
+                                            })
+
+                                            tempDialogue[
+                                                index
+                                            ].content = item.content.replace(
+                                                selectText,
+                                                ""
+                                            )
+                                            tempDialogue[
+                                                index
+                                            ].endTime = startTime
+
+                                            this.setChangeId(null, () => {
+                                                this.props.onDialogueChange(
+                                                    tempDialogue
+                                                )
+                                            })
+                                        }}
+                                    >
+                                        拆分
+                                    </ButtonSpace>
+                                )}
+                        </Fragment>
                     </Col>
                 )}
             </Row>
@@ -459,13 +606,14 @@ class TalkTimeLine extends PureComponent {
         const { changeId } = this.state
         const style = { fontSize: "1.5em" }
 
-        return changeId && changeId === item.id && this.props.onItemChange ? (
+        return !lodash.isNull(changeId) &&
+            changeId === item.id &&
+            this.props.onItemChange ? (
             this.renderMentions(item)
         ) : (
             <div
                 style={{ marginLeft: 12 }}
                 onClick={e => {
-                    console.debug("input click", item)
                     this.setChangeId(item.id)
                     e.stopPropagation()
                     e.preventDefault()
@@ -502,7 +650,7 @@ class TalkTimeLine extends PureComponent {
                 item={item}
                 index={index}
                 style={{
-                    fontSize: "1.5em"
+                    fontSize: "1.4em"
                 }}
                 ref={this.mention}
                 hotWordList={hotWordList}
@@ -513,7 +661,11 @@ class TalkTimeLine extends PureComponent {
                     console.log("onFocus", item)
                     this.setChangeId(item.id)
                 }}
-                onChange={this.props.onItemChange}
+                onChange={changeItem => {
+                    if (changeItem.content != item.content) {
+                        this.props.onItemChange(changeItem)
+                    }
+                }}
             />
         )
     }
@@ -550,7 +702,11 @@ class TalkTimeLine extends PureComponent {
                                     padding: "8px 8px 8px 8px"
                                 }}
                             >
-                                {this.renderInfo(item, index)}
+                                {this.renderInfo(
+                                    item,
+                                    index,
+                                    index == dialogue.length - 1
+                                )}
                                 <Row
                                     type="flex"
                                     justify={"space-between"}
@@ -566,7 +722,11 @@ class TalkTimeLine extends PureComponent {
             }
         })
 
-        return <Timeline reverse={reverse}>{itemList}</Timeline>
+        return (
+            <Timeline id="timeline" reverse={reverse}>
+                {itemList}
+            </Timeline>
+        )
     }
 }
 
