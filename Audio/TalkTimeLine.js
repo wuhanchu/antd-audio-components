@@ -103,7 +103,7 @@ class TalkTimeLine extends PureComponent {
     componentDidUpdate(prevProps, prevState) {
         // play 切换
         if (this.props.playId !== prevProps.playId) {
-            !lodash.isNull(this.props.playId) &&
+            !lodash.isNil(this.props.playId) &&
                 this.scrollToItem(this.dialogueMap[this.props.playId].item)
         }
 
@@ -118,7 +118,7 @@ class TalkTimeLine extends PureComponent {
             this.props.onChangeIdChange &&
                 this.props.onChangeIdChange(this.state.changeId)
             this.props.onPauseChange &&
-                this.props.onPauseChange(lodash.isNull(this.state.changeId))
+                this.props.onPauseChange(lodash.isNil(this.state.changeId))
         }
     }
 
@@ -404,12 +404,12 @@ class TalkTimeLine extends PureComponent {
                         >
                             {this.props.showUserSelect && this.roleDict && (
                                 <Fragment>
-                                    {!lodash.isNull(item.id) &&
+                                    {!lodash.isNil(item.id) &&
                                         this.renderUserSelect(item, index)}
                                 </Fragment>
                             )}
                         </Col>
-                        {!lodash.isNull(item.startTime) && (
+                        {!lodash.isNil(item.startTime) && (
                             <Col>
                                 <h6
                                     style={{
@@ -421,13 +421,13 @@ class TalkTimeLine extends PureComponent {
                                     时间区间:
                                 </h6>
                                 {utils.moment.getTimeShow(item.startTime)}
-                                {!lodash.isNull(item.endTime) &&
+                                {!lodash.isNil(item.endTime) &&
                                     " - " +
                                         utils.moment.getTimeShow(item.endTime)}
                             </Col>
                         )}
-                        {!lodash.isNull(item.id) &&
-                            !lodash.isNull(item.startTime) && (
+                        {!lodash.isNil(item.id) &&
+                            !lodash.isNil(item.startTime) && (
                                 <Fragment>
                                     <Col>
                                         <Icon
@@ -464,7 +464,7 @@ class TalkTimeLine extends PureComponent {
                                     </Col>
                                 </Fragment>
                             )}
-                        {!lodash.isEmpty(labels) && !lodash.isNull(item.id) && (
+                        {!lodash.isEmpty(labels) && !lodash.isNil(item.id) && (
                             <Col style={{ marginLeft: 20 }}>
                                 <h6
                                     style={{
@@ -518,7 +518,7 @@ class TalkTimeLine extends PureComponent {
                                         const { dialogue } = this.props
                                         let tempDialogue = clone(dialogue)
                                         let nextItem = tempDialogue[index + 1]
-                                        if (lodash.isNull(nextItem)) {
+                                        if (lodash.isNil(nextItem)) {
                                             return
                                         }
                                         nextItem.startTime = item.startTime
@@ -605,7 +605,7 @@ class TalkTimeLine extends PureComponent {
         const { changeId } = this.state
         const style = { fontSize: "1.5em" }
 
-        return !lodash.isNull(changeId) &&
+        return !lodash.isNil(changeId) &&
             changeId === item.id &&
             this.props.onItemChange ? (
             this.renderMentions(item)

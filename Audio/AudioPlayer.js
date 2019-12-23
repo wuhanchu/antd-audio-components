@@ -65,7 +65,7 @@ class AudioPlayer extends PureComponent {
 
         key = "left"
         method = e => {
-            if (!lodash.isNull(this.props.changeId)) {
+            if (!lodash.isNil(this.props.changeId)) {
                 return
             }
             e.preventDefault()
@@ -76,7 +76,7 @@ class AudioPlayer extends PureComponent {
 
         key = "right"
         method = e => {
-            if (!lodash.isNull(this.props.changeId)) {
+            if (!lodash.isNil(this.props.changeId)) {
                 return
             }
             e.preventDefault()
@@ -87,7 +87,7 @@ class AudioPlayer extends PureComponent {
 
         key = "shift+alt+left"
         method = e => {
-            if (lodash.isNull(this.props.changeId)) {
+            if (lodash.isNil(this.props.changeId)) {
                 return
             }
             e.preventDefault()
@@ -108,7 +108,7 @@ class AudioPlayer extends PureComponent {
 
         key = "shift+alt+right"
         method = e => {
-            if (lodash.isNull(this.props.changeId)) {
+            if (lodash.isNil(this.props.changeId)) {
                 return
             }
             e.preventDefault()
@@ -185,7 +185,7 @@ class AudioPlayer extends PureComponent {
         ) {
             if (this.props.pause) {
                 this.wavesurfer.pause()
-            } else if (!lodash.isNull(this.props.changeId)) {
+            } else if (!lodash.isNil(this.props.changeId)) {
                 const region = this.regions[this.props.playId]
                 if (region) {
                     const currentTime = this.wavesurfer.getCurrentTime()
