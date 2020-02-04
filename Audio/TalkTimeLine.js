@@ -186,7 +186,7 @@ class TalkTimeLine extends PureComponent {
             const { changeId } = this.state
 
             let nextItem = null
-            if (changeId) {
+            if (!lodash.isNil(changeId)) {
                 const nextIndex =
                     this.dialogueMap[this.state.changeId].index + 1
                 nextItem = this.props.dialogue[nextIndex]
