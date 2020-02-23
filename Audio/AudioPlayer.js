@@ -2,7 +2,7 @@
  * @module 音频波形组件
  * @param {Array} dialogue 对话数据
  * @param {String} [url] 音频url，和file二选一
- *  @param {Blob} [xhr] 认证信息
+ * @param {Blob} [xhr] 认证信息
  * @param {Blob} [file] 音频文件Blob对象，和url二选一
  * @param {Number} [playId] 播放ID
  * @param {Number} [changeId] 修改的数据ID
@@ -18,6 +18,8 @@ import WaveSurfer from "wavesurfer.js"
 import RegionPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min.js"
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min.js"
 import * as lodash from "lodash"
+
+// const keyboardJS = window.keyboardJS
 
 /**
  * Random RGBA color.
@@ -69,7 +71,7 @@ class AudioPlayer extends PureComponent {
                 return
             }
             e.preventDefault()
-            this.wavesurfer.skipBackward(1)
+            this.wavesurfer.skipBackward(0.3)
         }
         keyboardJS.bind(key, method)
         this.keyBindMethods.push({ key, method })
@@ -85,6 +87,33 @@ class AudioPlayer extends PureComponent {
         keyboardJS.bind(key, method)
         this.keyBindMethods.push({ key, method })
 
+        // speed up
+        key = "shift+alt+up"
+        method = e => {
+            e.preventDefault()
+            const rate = this.wavesurfer.getPlaybackRate()
+            if (rate >= 2) {
+                return
+            }
+            this.wavesurfer.setPlaybackRate(rate + 0.2)
+        }
+        keyboardJS.bind(key, method)
+        this.keyBindMethods.push({ key, method })
+
+        // speed down
+        key = "shift+alt+down"
+        method = e => {
+            e.preventDefault()
+            const rate = this.wavesurfer.getPlaybackRate()
+            if (rate <= 0.4) {
+                return
+            }
+            this.wavesurfer.setPlaybackRate(rate - 0.2)
+        }
+        keyboardJS.bind(key, method)
+        this.keyBindMethods.push({ key, method })
+
+        // back
         key = "shift+alt+left"
         method = e => {
             if (lodash.isNil(this.props.changeId)) {
@@ -101,11 +130,12 @@ class AudioPlayer extends PureComponent {
                 return
             }
 
-            this.wavesurfer.skipBackward(1)
+            this.wavesurfer.skipBackward(0.3)
         }
         keyboardJS.bind(key, method)
         this.keyBindMethods.push({ key, method })
 
+        // Fast forward
         key = "shift+alt+right"
         method = e => {
             if (lodash.isNil(this.props.changeId)) {
