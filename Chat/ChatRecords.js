@@ -13,7 +13,7 @@
  **/
 
 import React, {Fragment, useEffect} from "react"
-import {Col, Comment, List, Row, Spin, Typography} from "antd"
+import {Col, Comment, List, Row, Spin, Typography, Icon, Divider} from "antd"
 import styled from "styled-components"
 import * as lodash from "lodash"
 import style from "../style"
@@ -58,6 +58,7 @@ const CommentBase = styled(Comment)`
 
 const CommentClient = styled(CommentBase)`
     padding-right: 40%;
+    margin-top: 12px; 
     & .ant-comment-actions {
         float: left;
     }
@@ -72,7 +73,7 @@ const CommentMy = styled(CommentBase)`
         margin-left: 12px;
     }
     & .ant-comment-content-detail {
-        margin: auto 0 auto auto;
+        margin: auto 0px auto auto;
 
     }
     & .ant-comment-inner {
@@ -82,6 +83,8 @@ const CommentMy = styled(CommentBase)`
 `
 
 function ChatRecords({value, iconMy, status, iconInterlocutors, goingTip}) {
+    const audio = document.createElement("AUDIO")
+    console.log(value,"value")
     const data = value.map(item => ({
         ...item,
         avatar:
@@ -115,7 +118,6 @@ function ChatRecords({value, iconMy, status, iconInterlocutors, goingTip}) {
     }
 
     useEffect(() => {
-        console.debug("value", value)
         scrollToItem(lodash.last(value))
     }, [value])
 
@@ -128,14 +130,44 @@ function ChatRecords({value, iconMy, status, iconInterlocutors, goingTip}) {
                     <li>
                         <div>
                             {item.role == "my" ? (
-                                <CommentMy
-                                    id={"chat_" + item.id}
-                                    key={item.id}
-                                    actions={item.actions}
-                                    avatar={item.avatar}
-                                    content={item.content}
-                                />
-                            ) : (
+                                <Fragment>
+                                    <CommentMy
+                                        id={"chat_" + item.id}
+                                        key={item.id}
+                                        actions={item.actions}
+                                        avatar={item.avatar}
+                                        content={<div>
+                                            
+                                            {item.content}
+                                            {item.type&&item.c_wav&&<a style={{marginLeft: '5px'}}  onClick={()=>{
+                                                console.log(item.c_wav.split("|U:")[0])
+                                                audio.src ="/api/v1/recording/dialogue_user?filepath=" + item.c_wav.split("|U:")[0]
+                                                audio.play()
+                                            }}
+                                            >
+                                                <Icon  type="play-circle"></Icon></a>}
+                                        </div>}
+                                    />
+                                    <div>
+                                    {item.type&&<div 
+                                        style={{
+                                            marginRight: '55px', 
+                                            marginBottom: '30px',
+                                            background: '#e6f7ff', 
+                                            border: '1px solid #91d5ff', 
+                                            height: '31px', 
+                                            fontSize: '12px', 
+                                            float: 'right', 
+                                            padding: '5px 10px',
+                                            borderRadius: '5px'
+                                            }}>
+                                        {"命中：【" + item.type.info + "】"}
+                                    </div>}
+                                    </div>
+                                    
+                                </Fragment>
+
+                            ) : item.isDivider?<Divider><span style={{fontSize: '12px', color: 'rgba(0,0,0,0.5)'}}> 重新试听</span></Divider>: (
                                 <CommentClient
                                     id={"chat_" + item.id}
                                     key={item.id}

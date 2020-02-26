@@ -104,7 +104,6 @@ export default React.memo(
                     size={"small"}
                     defaultValue={changeText}
                     onBlur={event => {
-                        console.debug("onBlur event",event)
                         onChange({ ...item, content: changeText }, index)
                         onBlur && onBlur(item)
                     }}

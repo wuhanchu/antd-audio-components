@@ -654,7 +654,6 @@ class TalkTimeLine extends PureComponent {
                 ref={this.mention}
                 hotWordList={hotWordList}
                 onBlur={item => {
-                    console.debug("onBlur", item)
                 }}
                 onFocus={() => {
                     console.log("onFocus", item)
