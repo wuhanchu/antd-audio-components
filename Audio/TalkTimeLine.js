@@ -1,15 +1,14 @@
 import React, { Fragment, PureComponent } from "react"
 import {
-    Avatar,
     Card,
     Col,
     Icon,
     Mentions,
+    message,
     Row,
     Spin,
     Timeline,
-    Typography,
-    message
+    Typography
 } from "antd"
 import { antdUtils, frSchema } from "@/outter"
 import InputMentions from "@/components/Extra/Audio/InputMentions"
@@ -17,7 +16,6 @@ import CheckableTag from "antd/es/tag/CheckableTag"
 import ButtonSpace from "@/components/Extra/Button/ButtonSpace"
 import clone from "clone"
 import * as lodash from "lodash"
-import Immutable from "seamless-immutable"
 
 const { createComponent } = antdUtils.utils.component
 
@@ -146,7 +144,6 @@ class TalkTimeLine extends PureComponent {
                 return false
             }
         }
-
 
         node.onclick = event => {
             if (
@@ -653,8 +650,7 @@ class TalkTimeLine extends PureComponent {
                 }}
                 ref={this.mention}
                 hotWordList={hotWordList}
-                onBlur={item => {
-                }}
+                onBlur={item => {}}
                 onFocus={() => {
                     console.log("onFocus", item)
                     this.setChangeId(item.id)
