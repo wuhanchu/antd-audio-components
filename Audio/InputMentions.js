@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { PureComponent } from "react"
 
 import { Mentions } from "antd"
 
@@ -7,8 +7,8 @@ import { Mentions } from "antd"
  */
 
 function textSize(fontSize, fontFamily, text, wrapperWidth, whiteSpace) {
-    var span = document.createElement("div")
-    var result = {}
+    const span = document.createElement("div")
+    let result = {}
     result.width = span.offsetWidth
     result.height = span.offsetHeight
     span.style.visibility = "hidden"
@@ -31,109 +31,112 @@ function textSize(fontSize, fontFamily, text, wrapperWidth, whiteSpace) {
     return result
 }
 
-export default React.memo(
-    React.forwardRef(
-        (
-            { item, index, onBlur, onFocus, onChange, hotWordList, style },
-            mention
-        ) => {
-            const [changeText, setChangeText] = useState(item.content) // 修改语句Text
-            const [optionPrefix, setOptionPrefix] = useState([]) // 修改语句Text
-            // let mention = React.createRef()
+class InputMentions extends PureComponent {
+    state = {
+        changeText: null,
+        optionPrefix: []
+    }
 
-            useEffect(
-                () =>
-                    hotWordList &&
-                    hotWordList.forEach(item => {
-                        if (!item.hotWord) {
-                            return
-                        }
-                        optionPrefix.push(item.hotWord.substr(0, 1))
+    constructor(props) {
+        super(props)
 
-                        // todo 优化多字符匹配
-                        setOptionPrefix(optionPrefix)
-                    }),
-                [hotWordList]
-            )
+        const {
+            item,
+            hotWordList
+        } = props
 
-            /**
-             * 获取热词选项
-             * @returns {[]}
-             */
-            const getHotWordOptions = () => {
-                const options = []
-                hotWordList &&
-                    hotWordList.forEach(item => {
-                        item.hotWord &&
-                            options.push(
-                                <Option
-                                    key
-                                    Option
-                                    item={item.id}
-                                    value={item.hotWord.substr(1)}
-                                >
-                                    {item.hotWord}
-                                </Option>
-                            )
-                    })
-                return options
+        let optionPrefix = []
+        hotWordList &&
+        hotWordList.forEach(item => {
+            if (!item.hotWord) {
+                return
             }
-            //
-            // const rows = Math.floor(changeText.length / 50)
-            let wrapperWidth = document.body.clientWidth * 0.9 - 121.5 + "px"
-            let normalHeight = textSize(
-                "1.5em",
-                "",
-                changeText,
-                wrapperWidth,
-                "normal"
-            ).height
-            let nowrapHeight = textSize(
-                "1.5em",
-                "",
-                changeText,
-                document.body.clientWidth,
-                "nowrap"
-            ).height
-            const rows = normalHeight / nowrapHeight
-            return (
-                <Mentions
-                    // ref={ref}
-                    placement={"填写信息"}
-                    ref={mention}
-                    size={"small"}
-                    defaultValue={changeText}
-                    onBlur={event => {
-                        onChange({ ...item, content: changeText }, index)
-                        onBlur && onBlur(item)
-                    }}
-                    onFocus={() => {
-                        onFocus && onFocus(item)
-                    }}
-                    rows={rows}
-                    autoFocus={true}
-                    onChange={changeText => setChangeText(changeText)}
-                    split={""}
-                    filterOption={(input, option) => {
-                        for (let i = 1; i < option.children.length; i++) {
-                            return changeText.endsWith(
-                                option.children.substr(0, i)
-                            )
-                        }
-                    }}
-                    style={style}
-                    prefix={optionPrefix}
-                    validateSearch={(text, props) => {
-                        const result = optionPrefix.some(item =>
-                            changeText.endsWith(item)
-                        )
+            optionPrefix.push(item.hotWord.substr(0, 1))
+        })
 
-                        return result
-                    }}
+        this.state.optionPrefix = optionPrefix
+        this.state.changeText = item.content
+    }
+
+    /**
+     * 获取热词选项
+     * @returns {[]}
+     */
+    getHotWordOptions = () => {
+        const options = []
+        this.props.hotWordList &&
+        this.props.hotWordList.forEach(item => {
+            item.hotWord &&
+            options.push(
+                <Mentions.Option
+                    key
+                    Option
+                    item={item.id}
+                    value={item.hotWord.substr(1)}
                 >
-                    {getHotWordOptions()}
-                </Mentions>
+                    {item.hotWord}
+                </Mentions.Option>
             )
-        }
-    )
-)
+        })
+        return options
+    }
+
+    render() {
+        const { onChange, onBlur, index, onFocus, item, style, mention } = this.props
+        const { changeText, optionPrefix } = this.state
+
+        let wrapperWidth = document.body.clientWidth*0.9 - 121.5 + "px"
+        let normalHeight = textSize(
+            "1.5em",
+            "",
+            changeText,
+            wrapperWidth,
+            "normal"
+        ).height
+        let nowrapHeight = textSize(
+            "1.5em",
+            "",
+            changeText,
+            document.body.clientWidth,
+            "nowrap"
+        ).height
+        const rows = normalHeight/nowrapHeight
+
+        return <Mentions
+            // ref={ref}
+            placement={"填写信息"}
+            ref={mention}
+            size={"small"}
+            defaultValue={item.content}
+            onBlur={event => {
+                if (changeText != item.conent) {
+                    onChange({ ...item, content: changeText }, index)
+                }
+                onBlur && onBlur(item)
+            }}
+            onFocus={() => {
+                onFocus && onFocus(item)
+            }}
+            rows={rows}
+            autoFocus={true}
+            onChange={changeText => this.setState({ changeText })}
+            split={""}
+            filterOption={(input, option) => {
+                for (let i = 1; i < option.children.length; i++) {
+                    return changeText.endsWith(option.children.substr(0, i))
+                }
+            }}
+            style={style}
+            prefix={optionPrefix}
+            validateSearch={(text, props) => optionPrefix.some(item =>
+                changeText.endsWith(item)
+            )}
+        >
+            {this.getHotWordOptions()}
+        </Mentions>
+    }
+}
+
+export default React.forwardRef((props, ref) => <InputMentions
+    mention={ref} {...props}
+/>);

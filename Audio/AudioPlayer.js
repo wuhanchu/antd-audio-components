@@ -34,9 +34,9 @@ function randomColor(alpha) {
     return (
         "rgba(" +
         [
-            ~~(Math.random() * 255),
-            ~~(Math.random() * 255),
-            ~~(Math.random() * 255),
+            ~~(Math.random()*255),
+            ~~(Math.random()*255),
+            ~~(Math.random()*255),
             alpha || 1
         ] +
         ")"
@@ -173,11 +173,15 @@ class AudioPlayer extends PureComponent {
                 container,
                 height: 50,
                 hideScrollbar: false,
-                minPxPerSec: 30,
+                // minPxPerSec: 30,
                 scrollParent: true,
                 normalize: true,
                 plugins: [
-                    RegionPlugin.create(),
+                    RegionPlugin.create({
+                        dragSelection: {
+                            slop: 5
+                        }
+                    }),
                     TimelinePlugin.create({
                         container: "#wave-timeline"
                     })
@@ -237,7 +241,7 @@ class AudioPlayer extends PureComponent {
             if (
                 this.props.dialogue &&
                 prevProps.dialogue &&
-                this.props.dialogue.length !== prevProps.dialogue.length
+                this.props.dialogue !== prevProps.dialogue
             ) {
                 this.setRegions()
             }
@@ -254,6 +258,10 @@ class AudioPlayer extends PureComponent {
                 },
                 () => {
                     const region = this.regions[this.props.playId]
+                    if (region) {
+                        this.wavesurfer.pause()
+
+                    }
                     if (!this.props.pause && region) {
                         region.play()
                     }
@@ -264,9 +272,9 @@ class AudioPlayer extends PureComponent {
 
     setDialogueMap() {
         this.props.dialogue &&
-            this.props.dialogue.forEach(item => {
-                this.dialogueMap[item.id] = item
-            })
+        this.props.dialogue.forEach(item => {
+            this.dialogueMap[item.id] = item
+        })
     }
 
     setEvents = () => {
@@ -290,10 +298,7 @@ class AudioPlayer extends PureComponent {
             })
         })
         this.wavesurfer.on("region-out", region => {
-            // console.log("region-out")
-            // this.setState({ playId: null }, () => {
-            //     this.props.onPlayChange(null)
-            // })
+
         })
         this.wavesurfer.on("region-play", region => {
             this.setState({ pause: false }, () => {
@@ -309,6 +314,13 @@ class AudioPlayer extends PureComponent {
         this.wavesurfer.on("ready", (region, e) => {
             this.props.onReady && this.props.onReady(e)
         })
+
+        this.wavesurfer.on("region-update-end", (region, e) => {
+            console.debug("region", region)
+            this.props.onRegionUpdate && this.props.onRegionUpdate(region.id, Math.round(region.start*1000),
+                Math.round(region.end*1000)
+            )
+        })
     }
 
     /**
@@ -317,17 +329,26 @@ class AudioPlayer extends PureComponent {
     setRegions = () => {
         const { dialogue } = this.props
         this.wavesurfer.clearRegions()
+        let lastItem = null
         dialogue &&
-            dialogue.forEach(item => {
-                this.regions[item.id] = this.wavesurfer.addRegion({
-                    id: item.id,
-                    drag: false,
-                    resize: false,
-                    start: item.startTime / 1000,
-                    end: item.endTime / 1000,
-                    color: randomColor(0.1)
-                })
+        dialogue.forEach(item => {
+            if (lastItem && item.endTime < lastItem.endTime) {
+                return
+            }
+
+            this.regions[item.id] = this.wavesurfer.addRegion({
+                id: item.id,
+                drag: false,
+                resize: true,
+                loop: false,
+                start: (lastItem && item.startTime < lastItem.endTime? lastItem.endTime : item.startTime)/1000,
+                end: (item.endTime)/1000,
+                color: randomColor(0.1)
             })
+
+            lastItem = item
+
+        })
     }
 
     render() {
@@ -335,7 +356,7 @@ class AudioPlayer extends PureComponent {
         return (
             <Fragment>
                 <div id="wave-timeline"></div>
-                <div id="waveform" />
+                <div id="waveform"/>
                 <Row
                     gutter={8}
                     type={"flex"}
@@ -343,7 +364,7 @@ class AudioPlayer extends PureComponent {
                     style={{ marginTop: 8 }}
                 >
                     <Col>
-                        {pause ? (
+                        {pause? (
                             <Button
                                 onClick={() => {
                                     this.setState({
