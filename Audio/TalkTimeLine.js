@@ -613,8 +613,8 @@ class TalkTimeLine extends PureComponent {
                     e.preventDefault()
                 }}
             >
-                <Text disabled={!item.content.trim()} style={style}>
-                    {item.content.trim() || "空数据"}
+                <Text disabled={!(item.content && item.content.trim())} style={style}>
+                    {(item.content && item.content.trim()) || "空数据"}
                 </Text>
             </div>
         )
