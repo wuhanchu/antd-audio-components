@@ -495,7 +495,7 @@ class TalkTimeLine extends PureComponent {
                                         this.setChangeId(null, () =>
                                             this.props.onDialogueChange(
                                                 tempDialogue,
-                                                lastItem.id
+                                                null
                                             )
                                         )
                                     }}
@@ -521,7 +521,7 @@ class TalkTimeLine extends PureComponent {
                                         this.setChangeId(null, () => {
                                             this.props.onDialogueChange(
                                                 tempDialogue,
-                                                nextItem.id
+                                                null
                                             )
                                         })
                                     }}
@@ -681,7 +681,6 @@ class TalkTimeLine extends PureComponent {
                     return (
                         <Timeline.Item
                             key={item.id || index}
-                            id={"timeline_" + item.id}
                             dot={
                                 running &&
                                 !pause &&
