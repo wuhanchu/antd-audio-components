@@ -17,6 +17,8 @@ import React, { Fragment, PureComponent } from "react"
 import WaveSurfer from "wavesurfer.js"
 import RegionPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min.js"
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min.js"
+import Cursor from "wavesurfer.js/dist/plugin/wavesurfer.cursor"
+
 import * as lodash from "lodash"
 
 // const keyboardJS = window.keyboardJS
@@ -177,6 +179,16 @@ class AudioPlayer extends PureComponent {
                 scrollParent: true,
                 normalize: true,
                 plugins: [
+                    Cursor.create({
+                        showTime: true,
+                        opacity: 1,
+                        customShowTimeStyle: {
+                            'background-color': '#000',
+                            color: '#fff',
+                            padding: '2px',
+                            'font-size': '10px'
+                        }
+                    }),
                     RegionPlugin.create({
                         dragSelection: {
                             slop: 5
