@@ -5,7 +5,7 @@ import InputMentions from "@/components/Extra/Audio/InputMentions"
 import CheckableTag from "antd/es/tag/CheckableTag"
 import ButtonSpace from "@/components/Extra/Button/ButtonSpace"
 import clone from "clone"
-import * as lodash from "lodash"
+import * as _ from "lodash"
 
 const { createComponent } = antdUtils.utils.component
 
@@ -91,7 +91,7 @@ class TalkTimeLine extends PureComponent {
     componentDidUpdate(prevProps, prevState) {
         // play 切换
         if (this.props.playId !== prevProps.playId) {
-            !lodash.isNil(this.props.playId) &&
+            !_.isNil(this.props.playId) &&
             this.scrollToItem(this.dialogueMap[this.props.playId].item)
         }
 
@@ -102,11 +102,6 @@ class TalkTimeLine extends PureComponent {
         // changeId 正式
         if (this.props.changeId !== prevProps.changeId) {
             this.setChangeId(this.props.changeId)
-        } else if (this.state.changeId !== prevState.changeId) {
-            this.props.onChangeIdChange &&
-            this.props.onChangeIdChange(this.state.changeId)
-            this.props.onPauseChange &&
-            this.props.onPauseChange(lodash.isNil(this.state.changeId))
         }
     }
 
@@ -120,7 +115,13 @@ class TalkTimeLine extends PureComponent {
             this.mention && this.mention.blur()
         }
 
-        this.setState({ changeId }, callback)
+        this.setState({ changeId }, () => {
+            if (this.state.changeId !== this.props.changeId) {
+                this.props.onChangeIdChange &&
+                this.props.onChangeIdChange(this.state.changeId)
+            }
+            callback && callback()
+        })
     }
 
     /**
@@ -173,7 +174,7 @@ class TalkTimeLine extends PureComponent {
             const { changeId } = this.state
 
             let nextItem = null
-            if (!lodash.isNil(changeId)) {
+            if (!_.isNil(changeId)) {
                 const nextIndex =
                     this.dialogueMap[this.state.changeId].index + 1
                 nextItem = this.props.dialogue[nextIndex]
@@ -391,12 +392,12 @@ class TalkTimeLine extends PureComponent {
                         >
                             {this.props.showUserSelect && this.roleDict && (
                                 <Fragment>
-                                    {!lodash.isNil(item.id) &&
+                                    {!_.isNil(item.id) &&
                                     this.renderUserSelect(item, index)}
                                 </Fragment>
                             )}
                         </Col>
-                        {!lodash.isNil(item.startTime) && (
+                        {!_.isNil(item.startTime) && (
                             <Col>
                                 <h6
                                     style={{
@@ -408,13 +409,13 @@ class TalkTimeLine extends PureComponent {
                                     时间区间:
                                 </h6>
                                 {utils.moment.getTimeShow(item.startTime)}
-                                {!lodash.isNil(item.endTime) &&
+                                {!_.isNil(item.endTime) &&
                                 " - " +
                                 utils.moment.getTimeShow(item.endTime)}
                             </Col>
                         )}
-                        {!lodash.isNil(item.id) &&
-                        !lodash.isNil(item.startTime) && (
+                        {!_.isNil(item.id) &&
+                        !_.isNil(item.startTime) && (
                             <Fragment>
                                 <Col>
                                     <Icon
@@ -429,11 +430,17 @@ class TalkTimeLine extends PureComponent {
                                             fontSize: "14px"
                                         }}
                                         onClick={e => {
-                                            this.setChangeId(item.id)
-                                            playId === item.id &&
-                                            this.props.onPauseChange(
-                                                !this.props.pause
-                                            )
+                                            this.setChangeId(item.id, () => {
+                                                if (playId === item.id) {
+                                                    this.props.onPauseChange(
+                                                        !this.props.pause
+                                                    )
+                                                } else {
+                                                    this.props.onPauseChange(false)
+                                                }
+
+                                            })
+
                                         }}
                                     />
                                 </Col>
@@ -451,7 +458,7 @@ class TalkTimeLine extends PureComponent {
                                 </Col>
                             </Fragment>
                         )}
-                        {!lodash.isEmpty(labels) && !lodash.isNil(item.id) && (
+                        {!_.isEmpty(labels) && !_.isNil(item.id) && (
                             <Col style={{ marginLeft: 20 }}>
                                 <h6
                                     style={{
@@ -488,7 +495,7 @@ class TalkTimeLine extends PureComponent {
                                         lastItem.endTime = lastItem.endTime >= item.endTime? lastItem.endTime : item.endTime
 
                                         lastItem.content =
-                                            lastItem.content + item.content
+                                            (_.isNil(lastItem.content)? "" : lastItem.content) + (_.isNil(item.content)? "" : item.content)
 
                                         tempDialogue.splice(index, 1)
 
@@ -510,13 +517,14 @@ class TalkTimeLine extends PureComponent {
                                         const { dialogue } = this.props
                                         let tempDialogue = clone(dialogue)
                                         let nextItem = tempDialogue[index + 1]
-                                        if (lodash.isNil(nextItem)) {
+                                        if (_.isNil(nextItem)) {
                                             return
                                         }
                                         nextItem.startTime = item.startTime < nextItem.startTime? item.startTime : nextItem.startTime
                                         nextItem.endTime = item.endTime >= nextItem.endTime? item.endTime : nextItem.endTime
                                         nextItem.content =
-                                            item.content + nextItem.content
+                                            (_.isNil(item.content)? "" : item.content) + (_.isNil(nextItem.content)? "" : nextItem.content)
+
                                         tempDialogue.splice(index, 1)
                                         this.setChangeId(null, () => {
                                             this.props.onDialogueChange(
@@ -600,7 +608,7 @@ class TalkTimeLine extends PureComponent {
         const { changeId } = this.state
         const style = { fontSize: "1.5em" }
 
-        return !lodash.isNil(changeId) &&
+        return !_.isNil(changeId) &&
         changeId === item.id &&
         this.props.onItemChange? (
             this.renderMentions(item)
@@ -608,7 +616,7 @@ class TalkTimeLine extends PureComponent {
             <div
                 style={{ marginLeft: 12 }}
                 onClick={e => {
-                    this.setChangeId(item.id)
+                    this.setChangeId(item.id,)
                     e.stopPropagation()
                     e.preventDefault()
                 }}
@@ -620,13 +628,36 @@ class TalkTimeLine extends PureComponent {
         )
     }
 
+    isElementVisible(el) {
+        var rect = el.getBoundingClientRect(),
+            vWidth = window.innerWidth || doc.documentElement.clientWidth,
+            vHeight = window.innerHeight || doc.documentElement.clientHeight,
+            efp = function (x, y) {
+                return document.elementFromPoint(x, y)
+            };
+
+        // Return false if it's not in the viewport
+        if (rect.right < 0 || rect.bottom < 0
+            || rect.left > vWidth || rect.top > vHeight)
+            return false;
+
+        // Return true if any of its four corners are visible
+        return (
+            el.contains(efp(rect.left, rect.top))
+            || el.contains(efp(rect.right, rect.top))
+            || el.contains(efp(rect.right, rect.bottom))
+            || el.contains(efp(rect.left, rect.bottom))
+        );
+    }
+
     /**
      * 滚动到对应的位置
      * @param item
      */
     scrollToItem = function (item) {
         let anchorElement = document.getElementById("timeline_" + item.id)
-        if (anchorElement && anchorElement.getBoundingClientRect().top > window.innerHeight) {
+
+        if (anchorElement && !this.isElementVisible(anchorElement)) {
             anchorElement.scrollIntoView()
         }
     }
@@ -652,8 +683,9 @@ class TalkTimeLine extends PureComponent {
                 onBlur={item => {
                 }}
                 onFocus={() => {
-                    console.log("onFocus", item)
-                    this.setChangeId(item.id)
+                    this.setChangeId(item.id, () => {
+                        this.props.onPauseChange(false)
+                    })
                 }}
                 onChange={changeItem => {
                     if (changeItem.content != item.content) {
@@ -681,6 +713,7 @@ class TalkTimeLine extends PureComponent {
                     return (
                         <Timeline.Item
                             key={item.id || index}
+                            id={"timeline_" + item.id}
                             dot={
                                 running &&
                                 !pause &&
@@ -716,7 +749,7 @@ class TalkTimeLine extends PureComponent {
         })
 
         return (
-            <Timeline id="timeline" reverse={reverse}>
+            <Timeline id="timeline" reverse={reverse} style={{ ...this.props.style }}>
                 {itemList}
             </Timeline>
         )
