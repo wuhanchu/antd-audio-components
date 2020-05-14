@@ -175,6 +175,10 @@ class AudioPlayer extends PureComponent {
                 container,
                 height: 50,
                 hideScrollbar: false,
+                cursorColor: 'red',
+                cursorWidth: 2,
+                progressColor: 'red',
+
                 // minPxPerSec: 30,
                 scrollParent: true,
                 normalize: true,
@@ -183,16 +187,14 @@ class AudioPlayer extends PureComponent {
                         showTime: true,
                         opacity: 1,
                         customShowTimeStyle: {
-                            'background-color': '#000',
+                            'background-color': 'red',
                             color: '#fff',
                             padding: '2px',
                             'font-size': '10px'
                         }
                     }),
                     RegionPlugin.create({
-                        dragSelection: {
-                            slop: 5
-                        }
+                        dragSelection: true,
                     }),
                     TimelinePlugin.create({
                         container: "#wave-timeline"
@@ -250,13 +252,7 @@ class AudioPlayer extends PureComponent {
         if (this.props.dialogue !== prevProps.dialogue) {
             this.setDialogueMap()
 
-            if (
-                this.props.dialogue &&
-                prevProps.dialogue &&
-                this.props.dialogue !== prevProps.dialogue
-            ) {
-                this.setRegions()
-            }
+
         }
 
         // 播放位置变化
@@ -346,9 +342,9 @@ class AudioPlayer extends PureComponent {
         let lastItem = null
         dialogue &&
         dialogue.forEach(item => {
-            if (lastItem && item.endTime < lastItem.endTime) {
-                return
-            }
+            // if (lastItem && item.endTime < lastItem.endTime) {
+            //     return
+            // }
 
             this.regions[item.id] = this.wavesurfer.addRegion({
                 id: item.id,
