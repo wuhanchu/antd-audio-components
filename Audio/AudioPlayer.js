@@ -252,7 +252,13 @@ class AudioPlayer extends PureComponent {
         if (this.props.dialogue !== prevProps.dialogue) {
             this.setDialogueMap()
 
-
+            if (
+                this.props.dialogue &&
+                prevProps.dialogue &&
+                this.props.dialogue !== prevProps.dialogue
+            ) {
+                this.setRegions()
+            }
         }
 
         // 播放位置变化
@@ -353,7 +359,7 @@ class AudioPlayer extends PureComponent {
                 loop: false,
                 start: (lastItem && item.startTime < lastItem.endTime? lastItem.endTime : item.startTime)/1000,
                 end: (item.endTime)/1000,
-                color: randomColor(0.1)
+                color: "rgb(63, 63, 68,0.4)"
             })
 
             lastItem = item
