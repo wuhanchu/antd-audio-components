@@ -87,14 +87,14 @@ class InputMentions extends PureComponent {
 
         let wrapperWidth = document.body.clientWidth*0.9 - 121.5 + "px"
         let normalHeight = textSize(
-            "1.5em",
+            "1em",
             "",
             changeText,
             wrapperWidth,
             "normal"
         ).height
         let nowrapHeight = textSize(
-            "1.5em",
+            "1em",
             "",
             changeText,
             document.body.clientWidth,
@@ -107,6 +107,7 @@ class InputMentions extends PureComponent {
             placement={"填写信息"}
             ref={mention}
             size={"small"}
+            rows={rows}
             defaultValue={item.content}
             onBlur={event => {
                 if (changeText != item.conent) {
@@ -117,7 +118,6 @@ class InputMentions extends PureComponent {
             onFocus={() => {
                 onFocus && onFocus(item)
             }}
-            rows={rows}
             autoFocus={true}
             onChange={changeText => this.setState({ changeText })}
             split={""}
@@ -126,7 +126,6 @@ class InputMentions extends PureComponent {
                     return changeText.endsWith(option.children.substr(0, i))
                 }
             }}
-            style={style}
             prefix={optionPrefix}
             validateSearch={(text, props) => optionPrefix.some(item =>
                 changeText.endsWith(item)

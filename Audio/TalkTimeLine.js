@@ -14,6 +14,7 @@ const { actions, schemaFieldType, utils } = frSchema
 const { Text } = Typography
 const { Option } = Mentions
 
+
 /**
  *对话类型
  */
@@ -373,7 +374,7 @@ class TalkTimeLine extends PureComponent {
         }
 
         return (
-            <Row type="flex" align={"space-between"}>
+            <Row type="flex">
                 <Col>
                     <Row
                         type="flex"
@@ -381,7 +382,6 @@ class TalkTimeLine extends PureComponent {
                         gutter={8}
                         style={{
                             marginBottom: 12,
-                            fontSize: 14,
                             marginRight: 10
                         }}
                     >
@@ -402,8 +402,7 @@ class TalkTimeLine extends PureComponent {
                                 <h6
                                     style={{
                                         marginRight: 8,
-                                        display: "inline",
-                                        fontSize: 14
+                                        display: "inline"
                                     }}
                                 >
                                     时间区间:
@@ -427,7 +426,6 @@ class TalkTimeLine extends PureComponent {
                                         }
                                         style={{
                                             marginTop: "4px",
-                                            fontSize: "14px"
                                         }}
                                         onClick={e => {
                                             this.setChangeId(item.id, () => {
@@ -448,9 +446,7 @@ class TalkTimeLine extends PureComponent {
                                     {playId === item.id &&
                                     !this.props.pause && (
                                         <Icon
-                                            style={{
-                                                fontSize: "14px"
-                                            }}
+
                                             type="sync"
                                             spin
                                         />
@@ -463,17 +459,14 @@ class TalkTimeLine extends PureComponent {
                                 <h6
                                     style={{
                                         marginRight: 8,
-                                        display: "inline",
-                                        fontSize: 14
+                                        display: "inline"
                                     }}
                                 >
                                     标签:
                                 </h6>
 
                                 {labels.map(label =>
-                                    this.renderTag(item, index, label, {
-                                        fontSize: 14
-                                    })
+                                    this.renderTag(item, index, label, {})
                                 )}
                             </Col>
                         )}
@@ -502,12 +495,12 @@ class TalkTimeLine extends PureComponent {
                                         this.setChangeId(null, () =>
                                             this.props.onDialogueChange(
                                                 tempDialogue,
-                                                null
+                                                lastItem.id
                                             )
                                         )
                                     }}
                                 >
-                                    合并至上一段
+                                    往上合并
                                 </ButtonSpace>
                             )}
                             {!isLast && (
@@ -529,12 +522,12 @@ class TalkTimeLine extends PureComponent {
                                         this.setChangeId(null, () => {
                                             this.props.onDialogueChange(
                                                 tempDialogue,
-                                                null
+                                                nextItem.id
                                             )
                                         })
                                     }}
                                 >
-                                    合并至下一段
+                                    往下合并
                                 </ButtonSpace>
                             )}
                             {this.props.pause &&
@@ -606,7 +599,7 @@ class TalkTimeLine extends PureComponent {
      */
     renderInput(item) {
         const { changeId } = this.state
-        const style = { fontSize: "1.5em" }
+        const style = {}
 
         return !_.isNil(changeId) &&
         changeId === item.id &&
@@ -675,17 +668,19 @@ class TalkTimeLine extends PureComponent {
                 key={item.id}
                 item={item}
                 index={index}
-                style={{
-                    fontSize: "1.4em"
-                }}
+
                 ref={ref => this.mention = ref}
                 hotWordList={hotWordList}
                 onBlur={item => {
                 }}
                 onFocus={() => {
-                    this.setChangeId(item.id, () => {
-                        this.props.onPauseChange(false)
-                    })
+                    if (item.id !== this.props.changeId) {
+
+                        this.setChangeId(item.id, () => {
+                            this.props.onPauseChange(false)
+                        })
+
+                    }
                 }}
                 onChange={changeItem => {
                     if (changeItem.content != item.content) {
@@ -704,7 +699,9 @@ class TalkTimeLine extends PureComponent {
             switch (item.type) {
                 case RECORD_TYPE.sign:
                     return (
-                        <Timeline.Item key={item.id || index}>
+                        <
+                            Timeline.Item
+                            key={item.id || index}>
                             {item.content}
                         </Timeline.Item>
                     )

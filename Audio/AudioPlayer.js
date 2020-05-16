@@ -20,6 +20,7 @@ import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min.js
 import Cursor from "wavesurfer.js/dist/plugin/wavesurfer.cursor"
 
 import * as lodash from "lodash"
+const ButtonGroup = Button.Group;
 
 // const keyboardJS = window.keyboardJS
 
@@ -87,6 +88,7 @@ class AudioPlayer extends PureComponent {
             this.wavesurfer.skip(1)
         }
         keyboardJS.bind(key, method)
+        
         this.keyBindMethods.push({ key, method })
 
         // speed up
@@ -165,7 +167,6 @@ class AudioPlayer extends PureComponent {
     }
 
     componentDidMount() {
-        let wavesurfer = null
         const container = document.querySelector("#waveform")
 
         //  create element
@@ -219,6 +220,25 @@ class AudioPlayer extends PureComponent {
         this.setEvents()
     }
 
+    handlePlay(playRegion) {
+        if (!lodash.isNil(this.props.changeId)) {
+            let region = playRegion || this.regions[this.state.playId]
+            if (region) {
+                const currentTime = this.wavesurfer.getCurrentTime()
+                if (currentTime > region.end) {
+                    this.wavesurfer.play(region.start, region.end)
+                } else {
+                    this.wavesurfer.play(currentTime, region.end)
+                }
+
+            } else {
+                this.wavesurfer.play()
+            }
+        } else {
+            this.wavesurfer.play()
+        }
+    }
+
     componentDidUpdate = (prevProps, prevState) => {
         // 更新
         if (prevProps.url != this.props.url) {
@@ -233,18 +253,8 @@ class AudioPlayer extends PureComponent {
         ) {
             if (this.props.pause) {
                 this.wavesurfer.pause()
-            } else if (!lodash.isNil(this.props.changeId)) {
-                const region = this.regions[this.props.playId]
-                if (region) {
-                    const currentTime = this.wavesurfer.getCurrentTime()
-                    currentTime >= region.end
-                        ? region.play()
-                        : this.wavesurfer.play(currentTime, region.end)
-                } else {
-                    this.wavesurfer.play()
-                }
             } else {
-                this.wavesurfer.play()
+                this.handlePlay()
             }
         }
 
@@ -263,6 +273,14 @@ class AudioPlayer extends PureComponent {
 
         // 播放位置变化
         if (
+            this.props.changeId != prevProps.changeId &&
+            this.props.changeId
+        ) {
+            this.handlePlay()
+        }
+
+        // 播放位置变化
+        if (
             this.props.playId != prevProps.playId &&
             this.props.playId != this.state.playId
         ) {
@@ -271,13 +289,11 @@ class AudioPlayer extends PureComponent {
                     playId: this.props.playId
                 },
                 () => {
-                    const region = this.regions[this.props.playId]
-                    if (region) {
-                        this.wavesurfer.pause()
+                    const region = this.regions[this.state.playId]
 
-                    }
                     if (!this.props.pause && region) {
-                        region.play()
+                        this.wavesurfer.play(region.start, region.end)
+                        // region.play()
                     }
                 }
             )
@@ -293,28 +309,34 @@ class AudioPlayer extends PureComponent {
 
     setEvents = () => {
         this.wavesurfer.on("pause", () => {
-            console.log("did pause")
-
             this.setState({ pause: true }, () => {
                 this.props.pause != this.state.pause && this.props.onPauseChange && this.props.onPauseChange(true)
             })
         })
+
+        // this.wavesurfer.on("interaction", () => {
+        //     console.log("interaction")
+        //     this.handlePlay()
+        // })
 
         this.wavesurfer.on("play", () => {
             this.setState({ pause: false }, () => {
                 this.props.pause != this.state.pause && this.props.onPauseChange && this.props.onPauseChange(false)
             })
         })
+
         this.wavesurfer.on("region-in", region => {
-            console.log("region-in")
             this.setState({ playId: region.id }, () => {
                 this.props.playId != this.state.playId && this.props.onPlayChange && this.props.onPlayChange(region.id)
+            }, () => {
+                this.handlePlay(region)
             })
         })
         this.wavesurfer.on("region-out", region => {
-            // this.setState({ playId: null }, () => {
-            //     this.props.playId != this.state.playId && this.props.onPlayChange && this.props.onPlayChange(null)
+            // setTimeout(()=>{
+            //
             // })
+            // this.setState({ playId: null })
         })
         this.wavesurfer.on("region-play", region => {
             this.setState({ pause: false }, () => {
@@ -322,9 +344,11 @@ class AudioPlayer extends PureComponent {
             })
         })
 
-        this.wavesurfer.on("region-click", (region, e) => {
-            region.play()
-            this.props.onPlayChange && this.props.onPlayChange(region.id)
+        this.wavesurfer.on("region-click", region => {
+            setTimeout(() => {
+                this.handlePlay(region)
+
+            }, 100)
         })
 
         this.wavesurfer.on("ready", (region, e) => {
@@ -332,8 +356,9 @@ class AudioPlayer extends PureComponent {
         })
 
         this.wavesurfer.on("region-update-end", (region, e) => {
-            console.debug("region", region)
-            this.props.onRegionUpdate && this.props.onRegionUpdate(region.id, Math.round(region.start*1000),
+
+            this.props.onRegionUpdate && this.props.onRegionUpdate(region.id, Math.round(region.start*1000)
+                ,
                 Math.round(region.end*1000)
             )
         })
@@ -348,16 +373,17 @@ class AudioPlayer extends PureComponent {
         let lastItem = null
         dialogue &&
         dialogue.forEach(item => {
-            // if (lastItem && item.endTime < lastItem.endTime) {
-            //     return
-            // }
+            let start = (lastItem && item.startTime < lastItem.endTime? lastItem.endTime : item.startTime)
+            if (lastItem && start <= lastItem.endTime + 100) {
+                start = start + 100
+            }
 
             this.regions[item.id] = this.wavesurfer.addRegion({
                 id: item.id,
                 drag: false,
                 resize: true,
                 loop: false,
-                start: (lastItem && item.startTime < lastItem.endTime? lastItem.endTime : item.startTime)/1000,
+                start: start/1000,
                 end: (item.endTime)/1000,
                 color: "rgb(63, 63, 68,0.4)"
             })
@@ -380,30 +406,42 @@ class AudioPlayer extends PureComponent {
                     style={{ marginTop: 8 }}
                 >
                     <Col>
-                        {pause? (
-                            <Button
-                                onClick={() => {
-                                    this.setState({
-                                        pause: false
-                                    })
-                                    this.wavesurfer.play()
-                                }}
-                            >
-                                播放
-                            </Button>
-                        ) : (
-                            <Button
-                                onClick={() => {
-                                    this.setState({
-                                        pause: true
-                                    })
-                                    this.wavesurfer.pause()
-                                }}
-                            >
-                                暂停
-                            </Button>
-                        )}
+                        <ButtonGroup>
+                            {pause? (
+                                <Button
+                                    onClick={() => {
+                                        this.setState({
+                                            pause: false
+                                        })
+                                        this.handlePlay()
+                                    }}
+                                >
+                                    播放
+                                </Button>
+                            ) : (
+                                <Button
+                                    onClick={() => {
+                                        this.setState({
+                                            pause: true
+                                        })
+                                        this.wavesurfer.pause()
+                                    }}
+                                >
+                                    暂停
+                                </Button>
+                            )}
+                            {!_.isNil(this.props.changeId)? (
+                                <Button
+                                    onClick={() => {
+                                        this.props.onChangeIdChange(null)
+                                    }}
+                                >
+                                    退出编辑
+                                </Button>
+                            ) : null}
+                        </ButtonGroup>
                     </Col>
+
                     {this.props.operationExtend && (
                         <Col>{this.props.operationExtend}</Col>
                     )}
