@@ -20,6 +20,8 @@ import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min.js
 import Cursor from "wavesurfer.js/dist/plugin/wavesurfer.cursor"
 
 import * as lodash from "lodash"
+import { MARK_ACTIONS } from "@/pages/mark/components/MarkItem";
+
 const ButtonGroup = Button.Group;
 
 // const keyboardJS = window.keyboardJS
@@ -88,7 +90,7 @@ class AudioPlayer extends PureComponent {
             this.wavesurfer.skip(1)
         }
         keyboardJS.bind(key, method)
-        
+
         this.keyBindMethods.push({ key, method })
 
         // speed up
@@ -381,7 +383,7 @@ class AudioPlayer extends PureComponent {
             this.regions[item.id] = this.wavesurfer.addRegion({
                 id: item.id,
                 drag: false,
-                resize: true,
+                resize: this.props.action != MARK_ACTIONS.view,
                 loop: false,
                 start: start/1000,
                 end: (item.endTime)/1000,

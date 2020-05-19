@@ -120,6 +120,8 @@ class TalkTimeLine extends PureComponent {
                 this.props.onChangeIdChange &&
                 this.props.onChangeIdChange(this.state.changeId)
             }
+            this.props.onChangeIdChange(this.state.changeId)
+
             callback && callback()
         })
     }
@@ -438,8 +440,8 @@ class TalkTimeLine extends PureComponent {
                                                     )
                                                 } else {
                                                     this.props.onPauseChange(false)
+                                                    this.props.onPlayChange(item.id)
                                                 }
-
                                             })
 
                                         }}
@@ -615,7 +617,7 @@ class TalkTimeLine extends PureComponent {
             <div
                 style={{ marginLeft: 12 }}
                 onClick={e => {
-                    this.setChangeId(item.id,)
+                    this.setChangeId(item.id)
                     e.stopPropagation()
                     e.preventDefault()
                 }}
