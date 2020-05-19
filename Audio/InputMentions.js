@@ -87,14 +87,14 @@ class InputMentions extends PureComponent {
 
         let wrapperWidth = document.body.clientWidth*0.9 - 121.5 + "px"
         let normalHeight = textSize(
-            "1em",
+            "1.1em",
             "",
             changeText,
             wrapperWidth,
             "normal"
         ).height
         let nowrapHeight = textSize(
-            "1em",
+            "1.1em",
             "",
             changeText,
             document.body.clientWidth,
@@ -126,6 +126,7 @@ class InputMentions extends PureComponent {
                     return changeText.endsWith(option.children.substr(0, i))
                 }
             }}
+            style={style}
             prefix={optionPrefix}
             validateSearch={(text, props) => optionPrefix.some(item =>
                 changeText.endsWith(item)

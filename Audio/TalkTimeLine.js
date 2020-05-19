@@ -14,7 +14,6 @@ const { actions, schemaFieldType, utils } = frSchema
 const { Text } = Typography
 const { Option } = Mentions
 
-
 /**
  *对话类型
  */
@@ -382,6 +381,7 @@ class TalkTimeLine extends PureComponent {
                         gutter={8}
                         style={{
                             marginBottom: 12,
+                            fontSize: "1.1em",
                             marginRight: 10
                         }}
                     >
@@ -402,6 +402,7 @@ class TalkTimeLine extends PureComponent {
                                 <h6
                                     style={{
                                         marginRight: 8,
+                                        fontSize: "1em",
                                         display: "inline"
                                     }}
                                 >
@@ -426,6 +427,8 @@ class TalkTimeLine extends PureComponent {
                                         }
                                         style={{
                                             marginTop: "4px",
+                                            fontSize: "1.1em",
+
                                         }}
                                         onClick={e => {
                                             this.setChangeId(item.id, () => {
@@ -446,7 +449,9 @@ class TalkTimeLine extends PureComponent {
                                     {playId === item.id &&
                                     !this.props.pause && (
                                         <Icon
-
+                                            style={{
+                                                fontSize: "1.1em"
+                                            }}
                                             type="sync"
                                             spin
                                         />
@@ -458,6 +463,7 @@ class TalkTimeLine extends PureComponent {
                             <Col style={{ marginLeft: 20 }}>
                                 <h6
                                     style={{
+                                        fontSize: "1.1em",
                                         marginRight: 8,
                                         display: "inline"
                                     }}
@@ -599,7 +605,7 @@ class TalkTimeLine extends PureComponent {
      */
     renderInput(item) {
         const { changeId } = this.state
-        const style = {}
+        const style = { fontSize: "1.1em" }
 
         return !_.isNil(changeId) &&
         changeId === item.id &&
@@ -668,7 +674,9 @@ class TalkTimeLine extends PureComponent {
                 key={item.id}
                 item={item}
                 index={index}
-
+                style={{
+                    fontSize: "1.1em"
+                }}
                 ref={ref => this.mention = ref}
                 hotWordList={hotWordList}
                 onBlur={item => {
