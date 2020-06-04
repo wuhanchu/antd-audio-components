@@ -565,7 +565,7 @@ class TalkTimeLine extends PureComponent {
                                             return
                                         }
 
-                                        const id = item.id + startTime
+                                        const id = item.id + "_" + startTime
                                         tempDialogue.splice(index + 1, 0, {
                                             ...item,
                                             id: id,

@@ -196,9 +196,7 @@ class AudioPlayer extends PureComponent {
                             'font-size': '10px'
                         }
                     }),
-                    RegionPlugin.create({
-                        dragSelection: true,
-                    }),
+                    RegionPlugin.create({}),
                     TimelinePlugin.create({
                         container: "#wave-timeline"
                     })
@@ -358,7 +356,6 @@ class AudioPlayer extends PureComponent {
         })
 
         this.wavesurfer.on("region-update-end", (region, e) => {
-
             this.props.onRegionUpdate && this.props.onRegionUpdate(region.id, Math.round(region.start*1000)
                 ,
                 Math.round(region.end*1000)
@@ -371,8 +368,8 @@ class AudioPlayer extends PureComponent {
      */
     setRegions = () => {
         const { dialogue } = this.props
-        this.wavesurfer.clearRegions()
         let lastItem = null
+
         dialogue &&
         dialogue.forEach(item => {
             let start = (lastItem && item.startTime < lastItem.endTime? lastItem.endTime : item.startTime)
@@ -380,7 +377,8 @@ class AudioPlayer extends PureComponent {
                 start = start + 100
             }
 
-            this.regions[item.id] = this.wavesurfer.addRegion({
+            const currentRegion = this.regions[item.id]
+            const options = {
                 id: item.id,
                 drag: false,
                 resize: this.props.action != MARK_ACTIONS.view,
@@ -388,10 +386,17 @@ class AudioPlayer extends PureComponent {
                 start: start/1000,
                 end: (item.endTime)/1000,
                 color: "rgb(63, 63, 68,0.4)"
-            })
+            }
+
+            if (currentRegion) {
+                if (currentRegion.start != options.start || currentRegion.end != options.end) {
+                    currentRegion.update(options)
+                }
+            } else {
+                this.regions[item.id] = this.wavesurfer.addRegion(options)
+            }
 
             lastItem = item
-
         })
     }
 
