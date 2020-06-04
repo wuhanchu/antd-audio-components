@@ -456,7 +456,7 @@ class TalkTimeLine extends PureComponent {
                                             style={{
                                                 fontSize: "1.1em"
                                             }}
-                                            spin />
+                                            spin/>
                                     )}
                                 </Col>
                             </Fragment>
@@ -709,8 +709,7 @@ class TalkTimeLine extends PureComponent {
             switch (item.type) {
                 case RECORD_TYPE.sign:
                     return (
-                        <
-                            Timeline.Item
+                        <Timeline.Item
                             key={item.id || index}>
                             {item.content}
                         </Timeline.Item>
@@ -756,7 +755,7 @@ class TalkTimeLine extends PureComponent {
         })
 
         return (
-            <Timeline id="timeline" reverse={reverse} style={{ ...this.props.style }}>
+            <Timeline id="timeline" reverse={reverse} style={{ ...this.props.style, width: "100%" }}>
                 {itemList}
             </Timeline>
         )
