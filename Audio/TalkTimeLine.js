@@ -1,5 +1,7 @@
 import React, { Fragment, PureComponent } from "react"
-import { Card, Col, Icon, Mentions, message, Row, Spin, Timeline, Typography } from "antd"
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { SyncOutlined } from '@ant-design/icons';
+import { Card, Col, Mentions, message, Row, Spin, Timeline, Typography } from "antd";
 import { antdUtils, frSchema } from "@/outter"
 import InputMentions from "@/components/Extra/Audio/InputMentions"
 import CheckableTag from "antd/es/tag/CheckableTag"
@@ -420,7 +422,7 @@ class TalkTimeLine extends PureComponent {
                         !_.isNil(item.startTime) && (
                             <Fragment>
                                 <Col>
-                                    <Icon
+                                    <LegacyIcon
                                         type={
                                             playId === item.id &&
                                             !this.props.pause
@@ -450,13 +452,11 @@ class TalkTimeLine extends PureComponent {
                                 <Col>
                                     {playId === item.id &&
                                     !this.props.pause && (
-                                        <Icon
+                                        <SyncOutlined
                                             style={{
                                                 fontSize: "1.1em"
                                             }}
-                                            type="sync"
-                                            spin
-                                        />
+                                            spin />
                                     )}
                                 </Col>
                             </Fragment>
@@ -598,7 +598,7 @@ class TalkTimeLine extends PureComponent {
                     </Col>
                 )}
             </Row>
-        )
+        );
     }
 
     /**

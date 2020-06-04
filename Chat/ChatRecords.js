@@ -13,7 +13,8 @@
  **/
 
 import React, { Fragment, useEffect } from "react"
-import { Col, Comment, List, Row, Spin, Typography, Icon, Divider } from "antd"
+import { PlayCircleOutlined } from '@ant-design/icons';
+import { Col, Comment, List, Row, Spin, Typography, Divider } from "antd";
 import styled from "styled-components"
 import * as lodash from "lodash"
 import style from "../style"
@@ -155,7 +156,7 @@ function ChatRecords({ value, iconMy, status, iconInterlocutors, goingTip }) {
                                                             audio.play()
                                                         }}
                                                     >
-                                                        <Icon type="play-circle"></Icon>
+                                                        <PlayCircleOutlined></PlayCircleOutlined>
                                                     </a>
                                                 )}
                                             </div>
@@ -212,7 +213,7 @@ function ChatRecords({ value, iconMy, status, iconInterlocutors, goingTip }) {
                 <Comment></Comment>
             </Spin>
         </Fragment>
-    )
+    );
 }
 
 export default React.memo(ChatRecords)
