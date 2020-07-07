@@ -229,7 +229,7 @@ class TalkTimeLine extends PureComponent {
         })
 
         // play or suspend
-        key = "shift + alt + space"
+        key = "shift + alt + p"
         method = e => {
             e.preventDefault()
             this.props.onPauseChange(!this.props.pause)
@@ -333,7 +333,6 @@ class TalkTimeLine extends PureComponent {
          * 数据修改模型
          */
         const disabled = !this.props.onItemChange
-
         let inputProps = {
             showSearch: true,
             placeholder: "选择角色",

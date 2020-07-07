@@ -176,7 +176,7 @@ class AudioPlayer extends PureComponent {
             this.wavesurfer ||
             WaveSurfer.create({
                 container,
-                height: 50,
+                height: 75,
                 hideScrollbar: false,
                 cursorColor: 'red',
                 cursorWidth: 2,
@@ -346,8 +346,7 @@ class AudioPlayer extends PureComponent {
 
         this.wavesurfer.on("region-click", region => {
             setTimeout(() => {
-                this.handlePlay(region)
-
+                // this.handlePlay(region)
             }, 100)
         })
 
@@ -446,6 +445,39 @@ class AudioPlayer extends PureComponent {
                                     退出编辑
                                 </Button>
                             ) : null}
+                            <Button
+                                onClick={() => {
+                                    const rate = this.wavesurfer.getPlaybackRate()
+                                    if (rate >= 2) {
+                                        return
+                                    }
+                                    this.wavesurfer.setPlaybackRate(0.8)
+                                }}
+                            >
+                                0.5倍速
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    const rate = this.wavesurfer.getPlaybackRate()
+                                    if (rate >= 2) {
+                                        return
+                                    }
+                                    this.wavesurfer.setPlaybackRate(1)
+                                }}
+                            >
+                                1倍速
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    const rate = this.wavesurfer.getPlaybackRate()
+                                    if (rate >= 2) {
+                                        return
+                                    }
+                                    this.wavesurfer.setPlaybackRate(1.5)
+                                }}
+                            >
+                                1.5倍速
+                            </Button>
                         </ButtonGroup>
                     </Col>
 
