@@ -454,7 +454,7 @@ class AudioPlayer extends PureComponent {
                                     this.wavesurfer.setPlaybackRate(0.8)
                                 }}
                             >
-                                0.5倍速
+                                0.8倍速
                             </Button>
                             <Button
                                 onClick={() => {
