@@ -446,6 +446,7 @@ class AudioPlayer extends PureComponent {
                                 </Button>
                             ) : null}
                             <Button
+                                style={{marginLeft: '8px'}}
                                 onClick={() => {
                                     const rate = this.wavesurfer.getPlaybackRate()
                                     if (rate >= 2) {
@@ -473,10 +474,10 @@ class AudioPlayer extends PureComponent {
                                     if (rate >= 2) {
                                         return
                                     }
-                                    this.wavesurfer.setPlaybackRate(1.5)
+                                    this.wavesurfer.setPlaybackRate(1.2)
                                 }}
                             >
-                                1.5倍速
+                                1.2倍速
                             </Button>
                         </ButtonGroup>
                     </Col>
