@@ -76,7 +76,7 @@ class AudioPlayer extends PureComponent {
                 return
             }
             e.preventDefault()
-            this.wavesurfer.skipBackward(0.3)
+            this.wavesurfer.skipBackward(1)
         }
         keyboardJS.bind(key, method)
         this.keyBindMethods.push({ key, method })
