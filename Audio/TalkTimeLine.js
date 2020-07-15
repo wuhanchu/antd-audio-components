@@ -558,7 +558,7 @@ class TalkTimeLine extends PureComponent {
 
                                         if (
                                             item.endTime - startTime <
-                                            500
+                                            250
                                         ) {
                                             message.warn("拆分间隔太短！")
                                             return
