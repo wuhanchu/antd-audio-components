@@ -240,6 +240,83 @@ class TalkTimeLine extends PureComponent {
             method
         })
 
+        // play or suspend
+        key = "shift + alt + l"
+        method = e => {
+            // e.preventDefault()
+            console.log(e)
+            console.log(this.props.dialogue)
+            let index = this.state.itemIndex
+            console.log(this.props.dialogue[index])
+            let item = this.props.dialogue[index]
+            if(index){
+                const { dialogue } = this.props
+                let tempDialogue = clone(dialogue)
+                let lastItem = tempDialogue[index - 1]
+                console.log(lastItem)
+
+                lastItem.endTime = item.endTime
+                lastItem.startTime = lastItem.startTime < item.startTime? lastItem.startTime : item.startTime
+                lastItem.endTime = lastItem.endTime >= item.endTime? lastItem.endTime : item.endTime
+
+                lastItem.content =
+                    (_.isNil(lastItem.content)? "" : lastItem.content) + (_.isNil(item.content)? "" : item.content)
+
+                tempDialogue.splice(index, 1)
+
+                this.setChangeId(null, () =>
+                    this.props.onDialogueChange(
+                        tempDialogue,
+                        lastItem.id
+                    )
+                )
+            }
+            
+        }
+        keyboardJS.bind(key, method)
+        keyBindMethods.push({
+            key,
+            method
+        })
+        
+
+                // play or suspend
+                key = "shift + alt + K"
+                method = e => {
+                    // e.preventDefault()
+                    console.log(e)
+                    console.log(this.props.dialogue)
+                    let index = this.state.itemIndex
+                    console.log(this.props.dialogue[index])
+                    let item = this.props.dialogue[index]
+                    if(index!=undefined && index!=this.props.dialogue.length+1){
+                        const { dialogue } = this.props
+                        let tempDialogue = clone(dialogue)
+                        let nextItem = tempDialogue[index + 1]
+                        if (_.isNil(nextItem)) {
+                            return
+                        }
+                        nextItem.startTime = item.startTime < nextItem.startTime? item.startTime : nextItem.startTime
+                        nextItem.endTime = item.endTime >= nextItem.endTime? item.endTime : nextItem.endTime
+                        nextItem.content =
+                            (_.isNil(item.content)? "" : item.content) + (_.isNil(nextItem.content)? "" : nextItem.content)
+
+                        tempDialogue.splice(index, 1)
+                        this.setChangeId(null, () => {
+                            this.props.onDialogueChange(
+                                tempDialogue,
+                                nextItem.id
+                            )
+                        })
+                    }
+                    
+                }
+                keyboardJS.bind(key, method)
+                keyBindMethods.push({
+                    key,
+                    method
+                })
+
         // Without editing, play or suspend
         key = "space"
         method = e => {
@@ -604,14 +681,14 @@ class TalkTimeLine extends PureComponent {
      * 渲染输入框
      * @param {x} item
      */
-    renderInput(item) {
+    renderInput(item, index) {
         const { changeId } = this.state
         const style = { fontSize: "1.1em" }
 
         return !_.isNil(changeId) &&
         changeId === item.id &&
         this.props.onItemChange? (
-            this.renderMentions(item)
+            this.renderMentions(item, index)
         ) : (
             <div
                 style={{ marginLeft: 12 }}
@@ -683,6 +760,7 @@ class TalkTimeLine extends PureComponent {
                 onBlur={item => {
                 }}
                 onFocus={() => {
+                    this.setState({itemIndex: index})
                     if (item.id !== this.props.changeId) {
 
                         this.setChangeId(item.id, () => {
@@ -744,7 +822,7 @@ class TalkTimeLine extends PureComponent {
                                     gutter={20}
                                 >
                                     <Col span={24}>
-                                        {this.renderInput(item)}
+                                        {this.renderInput(item, index)}
                                     </Col>
                                 </Row>
                             </Card>
