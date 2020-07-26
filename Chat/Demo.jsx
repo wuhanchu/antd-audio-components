@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import ChatRecords from "./ChatRecords.js"
+import ChatRecords from "./ChatRecords.jsx"
 import clone from "clone"
 
 let timer = null
