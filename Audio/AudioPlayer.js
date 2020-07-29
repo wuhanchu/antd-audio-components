@@ -202,6 +202,7 @@ class AudioPlayer extends PureComponent {
 
     // load the file
     if (this.props.url) {
+      console.log('this.props.url', this.props.url);
       this.wavesurfer.load(this.props.url);
       this.setRegions();
     } else if (this.props.file) {
