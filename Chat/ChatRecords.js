@@ -57,16 +57,6 @@ const CommentBase = styled(Comment)`
 `
 
 const CommentClient = styled(CommentBase)`
-    padding-right: 40%;
-    & .ant-comment-actions {
-        float: left;
-    }
-`
-
-/**
- * my comment
- */
-const CommentMy = styled(CommentBase)`
     padding-left: 40%;
     & .ant-comment-avatar {
         margin-left: 12px;
@@ -78,7 +68,15 @@ const CommentMy = styled(CommentBase)`
     & .ant-comment-inner {
         flex-direction: row-reverse;
     }
-
+`
+/**
+ * my comment
+ */
+const CommentMy = styled(CommentBase)`
+    padding-right: 40%;
+    & .ant-comment-actions {
+        float: left;
+    }
 `
 
 function ChatRecords({value, iconMy, status, iconInterlocutors, goingTip}) {
