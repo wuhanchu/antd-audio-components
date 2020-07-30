@@ -15,19 +15,12 @@ class Dialogue extends React.PureComponent {
         dataSource: [],
         sendValue: "",
         isSpin: false,
-        data: [
-            {
-                actions: null,
-                content: "我有一个问题？",
-                id: 0,
-                role: "my"
-            }
-        ]
+
     }
 
     constructor(props) {
         super(props)
-        const { record } = props
+        const { record, data } = props
     }
 
     handleChange = value => {
@@ -46,17 +39,17 @@ class Dialogue extends React.PureComponent {
             return
         }
 
-        this.state.data.push({
+        this.props.data.push({
             actions: null,
             content: sendValue,
-            id: this.state.data.length + 1,
+            id: this.props.data.length + 1,
             role: "interlocutors"
         })
         let card = document.getElementById("card")
         setTimeout(() => {
             card.scrollTop = card.scrollHeight
         }, 10)
-        this.setState({ data: this.state.data, sendValue: "", isSpin: true })
+        this.setState({ data: this.props.data, sendValue: "", isSpin: true })
         const response = await schemas.question.service.search({
             search: sendValue,
             project_id: this.project_id
@@ -67,7 +60,7 @@ class Dialogue extends React.PureComponent {
         } else {
             list = response.list
         }
-        this.state.data.push({
+        this.props.data.push({
             content: (
                 <div
                     dangerouslySetInnerHTML={{
@@ -193,15 +186,15 @@ class Dialogue extends React.PureComponent {
                         )}
                     </Fragment>
                 ],
-            id: this.state.data.length + 1,
+            id: this.props.data.length + 1,
             role: "my"
         })
 
         setTimeout(() => {
             card.scrollTop = card.scrollHeight
         }, 100)
-        console.log(this.state.data)
-        this.setState({ data: this.state.data, isSpin: false })
+        console.log(this.props.data)
+        this.setState({ data: this.props.data, isSpin: false })
     }
 
     renderFooter() {
@@ -212,8 +205,7 @@ class Dialogue extends React.PureComponent {
         }
         return (
             <Card type="inner" title={<Space>
-                <SmileOutlined style={{ fontSize: 22 }}/><FolderOutlined style={{ fontSize: 24 }}/></Space>}
-                  extra={<a href="#">切换机器人</a>}>
+                <SmileOutlined style={{ fontSize: 22 }}/><FolderOutlined style={{ fontSize: 24 }}/></Space>}>
                 <div style={{ width: "100%", display: "flex", height: "42px", marginTop: "8px" }}>
                     <AutoComplete
                         dropdownMatchSelectWidth={252}
@@ -224,7 +216,7 @@ class Dialogue extends React.PureComponent {
                         onSelect={value => {
                             this.selectOpen = true
                         }}
-                        dataSource={this.state.dataSource}
+                        dataSource={this.props.dataSource}
                         {...others}
                     >
                         <Input
@@ -291,7 +283,7 @@ class Dialogue extends React.PureComponent {
                                     goingTip={"暂无数据"}
                                     iconMy={<Avatar src={rebotSvg}/>}
                                     iconInterlocutors={<Avatar src={mySvg}/>}
-                                    value={this.state.data}
+                                    value={this.props.data}
                                 ></CharRecords>
                             </Card>
                             {this.renderFooter()}
