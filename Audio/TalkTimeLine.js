@@ -1,13 +1,13 @@
-import React, { Fragment, PureComponent } from "react"
+import React, { Fragment, PureComponent } from 'react';
 import { Icon as LegacyIcon } from '@ant-design/compatible';
 import { SyncOutlined } from '@ant-design/icons';
-import { Card, Col, Mentions, message, Row, Spin, Timeline, Typography } from "antd";
-import { antdUtils, frSchema } from "@/outter"
-import InputMentions from "@/components/Extra/Audio/InputMentions"
-import CheckableTag from "antd/es/tag/CheckableTag"
-import ButtonSpace from "@/components/Extra/Button/ButtonSpace"
-import clone from "clone"
-import * as _ from "lodash"
+import { Card, Col, Mentions, message, Row, Spin, Timeline, Typography } from 'antd';
+import { antdUtils, frSchema } from '@/outter';
+import InputMentions from '@/components/Extra/Audio/InputMentions';
+import CheckableTag from 'antd/es/tag/CheckableTag';
+import ButtonSpace from '@/components/Extra/Button/ButtonSpace';
+import clone from 'clone';
+import * as _ from 'lodash';
 
 const { createComponent } = antdUtils.utils.component
 
@@ -271,14 +271,14 @@ class TalkTimeLine extends PureComponent {
                     )
                 )
             }
-            
+
         }
         keyboardJS.bind(key, method)
         keyBindMethods.push({
             key,
             method
         })
-        
+
 
                 // play or suspend
                 key = "shift + alt + K"
@@ -309,7 +309,7 @@ class TalkTimeLine extends PureComponent {
                             )
                         })
                     }
-                    
+
                 }
                 keyboardJS.bind(key, method)
                 keyBindMethods.push({
