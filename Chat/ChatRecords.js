@@ -108,13 +108,13 @@ function ChatRecords({value, iconMy, status, iconInterlocutors, goingTip}) {
 
         let anchorElement = document.getElementById("chat_" + item.id)
         if (anchorElement) {
-            anchorElement.scrollIntoView()
+            // anchorElement.scrollIntoView()
         }
     }
 
     useEffect(() => {
         console.debug("value", value)
-        scrollToItem(lodash.last(value))
+        // scrollToItem(lodash.last(value))
     }, [value])
 
     return (
