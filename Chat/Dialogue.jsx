@@ -3,11 +3,12 @@ import { AutoComplete, Avatar, Button, Menu, Card, Input, Spin, Space, Dropdown 
 import CharRecords from "./ChatRecords"
 import mySvg from "./assets/userhead.svg"
 import rebotSvg from "./assets/rebot.svg"
-import utils from "@/outter/fr-schema-antd-utils/src/utils"
+import frSchmaUtils from "@/outter/fr-schema-antd-utils/src"
 import style from "./Dialogue.less"
 import * as _ from "lodash"
 import { SmileOutlined, FolderOutlined } from '@ant-design/icons';
 
+const { utils } = frSchmaUtils
 const { url } = utils
 
 class Dialogue extends React.PureComponent {
