@@ -677,6 +677,66 @@ class TalkTimeLine extends PureComponent {
         );
     }
 
+    handleInputCheck (data, style) {
+        if(!this.props.showTips){
+            return null
+        }
+        if(data){
+            if(data.length > 40) {
+                return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
+            }
+            var reg = /[A-Z][A-Z]/g;
+            if(data.match(reg)){
+                return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
+            }
+            reg = /\哎/g;
+            var regs = /\噢/g
+            if(data.match(reg)|| data.match(regs)){
+                return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
+            }
+            reg = /\【/g;
+            regs = /\】/g
+            if(data.match(reg)|| data.match(regs)){
+                return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
+            }
+            if(data.charAt(data.length-1)!= '？' && data.charAt(data.length-1)!= '。'&& data.charAt(data.length-1)!= '；' && data.charAt(data.length-1)!= '！')
+                return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
+            if(data.charAt(data.length-2)==data.charAt(0)){
+                return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
+            }
+        }
+        
+    }
+
+    handleInputData (data) {
+        
+        if(data){
+            if(data.length > 40) {
+                return "*文字字数超过四十"
+            }
+            var reg = /[A-Z][A-Z]/g;
+            if(data.match(reg)){
+                return "*大写字母中间没有空格"
+            }
+            reg = /\哎/g;
+            var regs = /\噢/g
+            if(data.match(reg)||data.match(regs)){
+                return "*有哎或噢存在请检查是否确定"
+            }
+            if(data.charAt(data.length-1)!= '？' && data.charAt(data.length-1)!= '。'&& data.charAt(data.length-1)!= '；' && data.charAt(data.length-1)!= '！')
+                return '*句末符号出错'
+            reg = /\【/g;
+            regs = /\】/g
+            if(data.match(reg)|| data.match(regs)){
+                return '*【】应为[]'
+            }
+            if(data.charAt(data.length-2)==data.charAt(0)){
+                return "*请检查是否为无效语音"
+            }
+        }
+    }
+
+
     /**
      * 渲染输入框
      * @param {x} item
@@ -698,9 +758,14 @@ class TalkTimeLine extends PureComponent {
                     e.preventDefault()
                 }}
             >
-                <Text disabled={!(item.content && item.content.trim())} style={style}>
-                    {(item.content && item.content.trim()) || "空数据"}
-                </Text>
+                <div 
+                    style={this.handleInputCheck(item.content && item.content.trim(), style)}
+                >
+                    <Text disabled={!(item.content && item.content.trim())} style={ style}>
+                        {(item.content && item.content.trim()) || "空数据"}
+                    </Text>
+                </div>
+                {this.props.showTips && <span style={{ color:'red', marginTop: '5px', display: 'block'}}>{this.handleInputData(item.content && item.content.trim())}</span>}
             </div>
         )
     }
