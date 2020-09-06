@@ -34,7 +34,7 @@ const {Text} = Typography;
 const CommentBase = styled(Comment)`
     & .ant-comment-content-detail {
         border-radius: 5px;
-        background: ${style.colors.background.gray};  
+        background: ${style.colors.background.gray};
         padding: 10px;
         width: fit-content;
     }
@@ -56,23 +56,24 @@ const CommentBase = styled(Comment)`
     }
 `
 
-const CommentClient = styled(CommentBase)`
+const CommentMy = styled(CommentBase)`
     padding-right: 40%;
+    margin-top: 12px;
     & .ant-comment-actions {
         float: left;
     }
 `
+
 /**
  * my comment
  */
-const CommentMy = styled(CommentBase)`
+const CommentClient = styled(CommentBase)`
     padding-left: 40%;
     & .ant-comment-avatar {
         margin-left: 12px;
     }
     & .ant-comment-content-detail {
-        margin: auto 0 auto auto;
-
+        margin: auto 0px auto auto;
     }
     & .ant-comment-inner {
         flex-direction: row-reverse;
