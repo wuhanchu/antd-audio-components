@@ -81,6 +81,34 @@ class InputMentions extends PureComponent {
         return options
     }
 
+    handleInputData (data) {
+        console.log(data)
+        if(data){
+            if(data.length > 40) {
+                return "*文字字数超过四十"
+            }
+            var reg = /[A-Z][A-Z]/g;
+            if(data.match(reg)){
+                return "*大写字母中间没有空格"
+            }
+            reg = /\哎/g;
+            var regs = /\噢/g
+            if(data.search("哎") != -1 ||data.search("噢") != -1){
+                return "*有哎或噢存在请检查是否确定"
+            }
+            if(data.charAt(data.length-1)!= '？' && data.charAt(data.length-1)!= '。'&& data.charAt(data.length-1)!= '；' && data.charAt(data.length-1)!= '！')
+                return '*句末符号出错'
+            reg = /\【/g;
+            regs = /\】/g
+            if(data.search("】") != -1 ||data.search("【") != -1){
+                return '*【】应为[]'
+            }
+            if(data.charAt(data.length-2)==data.charAt(0)){
+                return "*请检查是否为无效语音"
+            }
+        }
+    }
+
     render() {
         const { onChange, onBlur, index, onFocus, item, style, mention } = this.props
         const { changeText, optionPrefix } = this.state
@@ -102,7 +130,7 @@ class InputMentions extends PureComponent {
         ).height
         const rows = normalHeight/nowrapHeight
 
-        return <Mentions
+        return <><Mentions
             // ref={ref}
             placement={"填写信息"}
             ref={mention}
@@ -134,6 +162,8 @@ class InputMentions extends PureComponent {
         >
             {this.getHotWordOptions()}
         </Mentions>
+        {this.props.showTips && <span style={{ color:'red', marginTop: '5px', display: 'block'}}>{this.handleInputData(changeText && changeText.trim())}</span>}
+        </>
     }
 }
 

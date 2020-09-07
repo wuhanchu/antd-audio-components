@@ -603,6 +603,7 @@ class TalkTimeLine extends PureComponent {
                                             (_.isNil(item.content)? "" : item.content) + (_.isNil(nextItem.content)? "" : nextItem.content)
 
                                         tempDialogue.splice(index, 1)
+                                        console.log(tempDialogue)
                                         this.setChangeId(null, () => {
                                             this.props.onDialogueChange(
                                                 tempDialogue,
@@ -689,14 +690,12 @@ class TalkTimeLine extends PureComponent {
             if(data.match(reg)){
                 return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
             }
-            reg = /\哎/g;
             var regs = /\噢/g
-            if(data.match(reg)|| data.match(regs)){
+            if(data.search("哎") != -1 ||data.search("噢") != -1){
+
                 return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
             }
-            reg = /\【/g;
-            regs = /\】/g
-            if(data.match(reg)|| data.match(regs)){
+            if(data.search("】") != -1 ||data.search("【") != -1){
                 return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
             }
             if(data.charAt(data.length-1)!= '？' && data.charAt(data.length-1)!= '。'&& data.charAt(data.length-1)!= '；' && data.charAt(data.length-1)!= '！')
@@ -709,7 +708,6 @@ class TalkTimeLine extends PureComponent {
     }
 
     handleInputData (data) {
-        
         if(data){
             if(data.length > 40) {
                 return "*文字字数超过四十"
@@ -718,16 +716,13 @@ class TalkTimeLine extends PureComponent {
             if(data.match(reg)){
                 return "*大写字母中间没有空格"
             }
-            reg = /\哎/g;
             var regs = /\噢/g
-            if(data.match(reg)||data.match(regs)){
+            if(data.search("哎") != -1 ||data.search("噢") != -1){
                 return "*有哎或噢存在请检查是否确定"
             }
             if(data.charAt(data.length-1)!= '？' && data.charAt(data.length-1)!= '。'&& data.charAt(data.length-1)!= '；' && data.charAt(data.length-1)!= '！')
                 return '*句末符号出错'
-            reg = /\【/g;
-            regs = /\】/g
-            if(data.match(reg)|| data.match(regs)){
+            if(data.search("】") != -1 ||data.search("【") != -1){
                 return '*【】应为[]'
             }
             if(data.charAt(data.length-2)==data.charAt(0)){
@@ -748,7 +743,7 @@ class TalkTimeLine extends PureComponent {
         return !_.isNil(changeId) &&
         changeId === item.id &&
         this.props.onItemChange? (
-            this.renderMentions(item, index)
+            this.renderMentions(item, index, this.props.showTips)
         ) : (
             <div
                 style={{ marginLeft: 12 }}
@@ -810,10 +805,11 @@ class TalkTimeLine extends PureComponent {
      * @param index
      * @returns {*}
      */
-    renderMentions = (item, index) => {
+    renderMentions = (item, index, showTips) => {
         const { hotWordList } = this.props
         return (
             <InputMentions
+                showTips={showTips}
                 key={item.id}
                 item={item}
                 index={index}
