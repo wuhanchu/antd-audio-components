@@ -360,6 +360,7 @@ class AudioPlayer extends PureComponent {
 	setRegions = () => {
 		const { dialogue } = this.props;
 		let lastItem = null;
+		this.wavesurfer.clearRegions()
 
 		dialogue &&
 			dialogue.forEach((item) => {
@@ -379,22 +380,9 @@ class AudioPlayer extends PureComponent {
 					end: item.endTime / 1000,
 					color: 'rgb(63, 63, 68,0.4)',
 				};
-
-				if (currentRegion) {
-					if (currentRegion.start != options.start || currentRegion.end != options.end) {
-						currentRegion.update(options);
-					}
-				} else {
-					this.regions[item.id] = this.wavesurfer.addRegion(options);
-				}
-				// this.wavesurfer.regions && this.wavesurfer.regions.list.map((item, index) => {
-				// 	console.log(item)
-				// })
-
+				this.regions[item.id] = this.wavesurfer.addRegion(options);
 				lastItem = item;
 			});
-			delete this.wavesurfer.regions.list[1]
-			console.log(this.wavesurfer.regions)
 
 	};
 

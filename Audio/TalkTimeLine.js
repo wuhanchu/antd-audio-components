@@ -653,7 +653,7 @@ class TalkTimeLine extends PureComponent {
 
                                         tempDialogue[
                                             index
-                                            ].content = item.content.replace(
+                                            ].content = item.content && item.content.replace(
                                             selectText,
                                             ""
                                         )
