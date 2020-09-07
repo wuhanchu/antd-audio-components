@@ -94,7 +94,7 @@ class InputMentions extends PureComponent {
             reg = /\哎/g;
             var regs = /\噢/g
             if(data.search("哎") != -1 ||data.search("噢") != -1){
-                return "*有哎或噢存在请检查是否确定"
+                return "*有哎或噢存在请检查是否正确"
             }
             if(data.charAt(data.length-1)!= '？' && data.charAt(data.length-1)!= '。'&& data.charAt(data.length-1)!= '；' && data.charAt(data.length-1)!= '！')
                 return '*句末符号出错'
@@ -103,7 +103,15 @@ class InputMentions extends PureComponent {
             if(data.search("】") != -1 ||data.search("【") != -1){
                 return '*【】应为[]'
             }
-            if(data.charAt(data.length-2)==data.charAt(0)){
+            var isCanUse = true
+            for(var i=0;i<data.length - 1;i++){
+                if(data[i]===data[0]){
+                }else{
+                    isCanUse= false
+                    break
+                }
+            }
+            if(isCanUse){
                 return "*请检查是否为无效语音"
             }
         }
