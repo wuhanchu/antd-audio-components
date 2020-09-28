@@ -18,6 +18,7 @@ import WaveSurfer from 'wavesurfer.js';
 import RegionPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.regions.min.js';
 import TimelinePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.timeline.min.js';
 import Cursor from 'wavesurfer.js/dist/plugin/wavesurfer.cursor';
+import  keyboardJS from 'keyboardjs'
 
 import * as lodash from 'lodash';
 import { MARK_ACTIONS } from '@/pages/mark/components/MarkItem';

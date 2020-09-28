@@ -8,6 +8,7 @@ import CheckableTag from 'antd/es/tag/CheckableTag';
 import ButtonSpace from '@/components/Extra/Button/ButtonSpace';
 import clone from 'clone';
 import * as _ from 'lodash';
+import  keyboardJS from 'keyboardjs'
 
 const { createComponent } = antdUtils.utils.component
 
