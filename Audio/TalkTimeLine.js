@@ -593,6 +593,7 @@ class TalkTimeLine extends PureComponent {
                                     onClick={() => {
                                         const { dialogue } = this.props
                                         let tempDialogue = clone(dialogue)
+                                        tempDialogue[index + 1].id = index
                                         let nextItem = tempDialogue[index + 1]
                                         if (_.isNil(nextItem)) {
                                             return
