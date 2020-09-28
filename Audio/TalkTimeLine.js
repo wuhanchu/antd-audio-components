@@ -94,7 +94,14 @@ class TalkTimeLine extends PureComponent {
         // play 切换
         if (this.props.playId !== prevProps.playId) {
             !_.isNil(this.props.playId) &&
-            this.scrollToItem(this.dialogueMap[this.props.playId].item)
+            console.log("this.props.playId",this.props.playId)
+            console.log(this.dialogueMap)
+            try {
+                this.scrollToItem(this.dialogueMap[this.props.playId].item)
+                
+            } catch (error) {
+                
+            }
         }
 
         if (this.props.dialogue !== prevProps.dialogue) {
@@ -576,6 +583,12 @@ class TalkTimeLine extends PureComponent {
 
                                         tempDialogue.splice(index, 1)
 
+                                        tempDialogue = tempDialogue.map((item, indexs)=>{
+                                            if(indexs >= index)
+                                                return { ...item, id: item.id-1}
+                                            return { ... item }
+                                        })
+
                                         this.setChangeId(null, () =>
                                             this.props.onDialogueChange(
                                                 tempDialogue,
@@ -593,7 +606,7 @@ class TalkTimeLine extends PureComponent {
                                     onClick={() => {
                                         const { dialogue } = this.props
                                         let tempDialogue = clone(dialogue)
-                                        tempDialogue[index + 1].id = index
+                                        // tempDialogue[index + 1].id = index
                                         let nextItem = tempDialogue[index + 1]
                                         if (_.isNil(nextItem)) {
                                             return
@@ -604,7 +617,13 @@ class TalkTimeLine extends PureComponent {
                                             (_.isNil(item.content)? "" : item.content) + (_.isNil(nextItem.content)? "" : nextItem.content)
 
                                         tempDialogue.splice(index, 1)
+                                        tempDialogue = tempDialogue.map((item, indexs)=>{
+                                            if(indexs >= index)
+                                                return { ...item, id: item.id-1}
+                                            return { ... item }
+                                        })
                                         console.log(tempDialogue)
+
                                         this.setChangeId(null, () => {
                                             this.props.onDialogueChange(
                                                 tempDialogue,
@@ -644,14 +663,26 @@ class TalkTimeLine extends PureComponent {
                                         }
 
                                         const id = item.id + "_" + startTime
+                                        // tempDialogue.splice(index + 1, 0, {
+                                        //     ...item,
+                                        //     id: id,
+                                        //     startTime,
+                                        //     entTime: item.endTime,
+                                        //     content: selectText
+                                        // })
                                         tempDialogue.splice(index + 1, 0, {
                                             ...item,
-                                            id: id,
+                                            id: index ,
                                             startTime,
                                             entTime: item.endTime,
                                             content: selectText
                                         })
-
+                                        tempDialogue = tempDialogue.map((item, indexs)=>{
+                                            if(indexs >= index +1)
+                                                return { ...item, id: item.id+1}
+                                            return { ... item }
+                                        })
+                                        console.log(tempDialogue)
                                         tempDialogue[
                                             index
                                             ].content = item.content && item.content.replace(
@@ -662,9 +693,10 @@ class TalkTimeLine extends PureComponent {
                                             index
                                             ].endTime = startTime
 
+                                            console.log(index)
                                         this.setChangeId(null, () => {
                                             this.props.onDialogueChange(
-                                                tempDialogue, id
+                                                tempDialogue, index
                                             )
                                         })
                                     }}
