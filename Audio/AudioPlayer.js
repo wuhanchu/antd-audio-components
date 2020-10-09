@@ -349,8 +349,8 @@ class AudioPlayer extends PureComponent {
 			this.props.onRegionUpdate &&
 				this.props.onRegionUpdate(
 					region.id,
-					Math.round(region.start * 1000),
-					Math.round(region.end * 1000),
+					region.start > 0 ? Math.round(region.start * 1000): 0,
+					region.end > 0 ? Math.round(region.end * 1000) : 0,
 				);
 		});
 	};
