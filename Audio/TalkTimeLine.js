@@ -705,6 +705,7 @@ class TalkTimeLine extends PureComponent {
                                     拆分
                                 </ButtonSpace>
                             )}
+                            {(item.endTime - item.startTime)/ 1000 > 10 ? <span style={{ color:'red', marginTop: '5px'}}>*音频段超过十秒请拆分</span>: ''}
                         </Fragment>
                     </Col>
                 )}
@@ -717,9 +718,9 @@ class TalkTimeLine extends PureComponent {
             return null
         }
         if(data){
-            if(data.length > 40) {
-                return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
-            }
+            // if(data.length > 40) {
+            //     return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
+            // }
             var reg = /[A-Z][A-Z]/g;
             if(data.match(reg)){
                 return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
@@ -751,9 +752,9 @@ class TalkTimeLine extends PureComponent {
 
     handleInputData (data) {
         if(data){
-            if(data.length > 40) {
-                return "*文字字数超过四十"
-            }
+            // if(data.length > 40) {
+            //     return "*文字字数超过四十"
+            // }
             var reg = /[A-Z][A-Z]/g;
             if(data.match(reg)){
                 return "*大写字母中间没有空格"

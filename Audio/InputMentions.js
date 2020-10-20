@@ -84,9 +84,9 @@ class InputMentions extends PureComponent {
     handleInputData (data) {
         console.log(data)
         if(data){
-            if(data.length > 40) {
-                return "*文字字数超过四十"
-            }
+            // if(data.length > 40) {
+            //     return "*文字字数超过四十"
+            // }
             var reg = /[A-Z][A-Z]/g;
             if(data.match(reg)){
                 return "*大写字母中间没有空格"
