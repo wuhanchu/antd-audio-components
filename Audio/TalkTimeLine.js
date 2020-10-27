@@ -342,6 +342,36 @@ class TalkTimeLine extends PureComponent {
             method
         })
 
+        key = "ctrl + ["
+        method = e => {
+            let index = this.state.itemIndex
+            let item = this.props.dialogue[index]
+            if(index!=undefined){
+                this.handleChangeTag(item, 0, {color: "blue", remark: "男", value: "man"}, "", !item.labels.man)
+
+            }
+        }
+
+        keyboardJS.bind(key, method)
+        keyBindMethods.push({
+            key,
+            method
+        })
+
+        key = "ctrl + ]"
+        method = e => {
+            let index = this.state.itemIndex
+            let item = this.props.dialogue[index]
+            if(index!=undefined){
+                this.handleChangeTag(item, 0, {color: "pink", remark: "女", value: "woman"}, "",  !item.labels.woman)
+            }
+        }
+
+        keyboardJS.bind(key, method)
+        keyBindMethods.push({
+            key,
+            method
+        })
         // 提交
         key = "ctrl + enter"
         method = e => {
@@ -378,6 +408,22 @@ class TalkTimeLine extends PureComponent {
      * @param index
      * @returns {*}
      */
+
+    
+    handleChangeTag = (item, index, label, inStyle, mark) =>{
+        const { onLabelChange } = this.props
+        const { remark, value, color = "red", checkFunc, ...others } = label
+        let checked = item.labels && item.labels[value]
+        if (checkFunc) {
+            checked = checkFunc(item)
+        }
+        const labels = { ...item.labels }
+        labels[value] = mark
+        console.log(mark)
+        this.props.onItemChange &&
+        this.props.onItemChange({ ...item, labels })
+    }
+
     renderTag = (item, index, label, inStyle) => {
         const { onLabelChange } = this.props
 
@@ -400,12 +446,10 @@ class TalkTimeLine extends PureComponent {
                 key={value}
                 color={"red"}
                 checked={checked}
-                onChange={mark => {
+                onChange={(mark) => {
+                    this.handleChangeTag(item, index, label, inStyle, mark)
                     // 数据请求
-                    const labels = { ...item.labels }
-                    labels[value] = mark
-                    this.props.onItemChange &&
-                    this.props.onItemChange({ ...item, labels })
+                    
                 }}
             >
                 {remark}
