@@ -347,7 +347,7 @@ class TalkTimeLine extends PureComponent {
             let index = this.state.itemIndex
             let item = this.props.dialogue[index]
             if(index!=undefined){
-                this.handleChangeTag(item, 0, {color: "blue", remark: "男", value: "man"}, "", !item.labels.man)
+                this.handleChangeTag(item, 0, {color: "blue", remark: "男", value: "man"}, "", item.labels? !item.labels.man: true)
 
             }
         }
@@ -363,7 +363,7 @@ class TalkTimeLine extends PureComponent {
             let index = this.state.itemIndex
             let item = this.props.dialogue[index]
             if(index!=undefined){
-                this.handleChangeTag(item, 0, {color: "pink", remark: "女", value: "woman"}, "",  !item.labels.woman)
+                this.handleChangeTag(item, 0, {color: "pink", remark: "女", value: "woman"}, "", item.labels? !item.labels.woman: true)
             }
         }
 
