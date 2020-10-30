@@ -130,6 +130,11 @@ class TalkTimeLine extends PureComponent {
                 this.props.onChangeIdChange &&
                 this.props.onChangeIdChange(this.state.changeId)
             }
+            if (this.state.changeId == 0) {
+                console.log(this.dialogueMap[0].item)
+                this.scrollToItem(this.dialogueMap[0].item)
+            }
+
             this.props.onChangeIdChange(this.state.changeId)
 
             callback && callback()
@@ -196,12 +201,23 @@ class TalkTimeLine extends PureComponent {
                 nextItem = this.props.dialogue[0]
             }
 
+            
+
             if (!nextItem) {
                 this.setChangeId(null)
 
                 return
             }
+            if(nextItem.id===0 && !this.dialogueMap[1]){
+                console.log(this.dialogueMap)
 
+                if (this.props.onItemChange && this.state.changeId) {
+                    return
+                }
+    
+                e.preventDefault()
+                this.props.onPauseChange(!this.props.pause)
+            }
             this.setChangeId(nextItem.id)
         }
         keyboardJS.bind(key, method)
