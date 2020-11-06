@@ -342,7 +342,7 @@ class TalkTimeLine extends PureComponent {
                 })
 
         // Without editing, play or suspend
-        key = "space"
+        key = "shift + space"
         method = e => {
             if (this.props.onItemChange && this.state.changeId) {
                 return
