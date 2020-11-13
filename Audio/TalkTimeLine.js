@@ -376,7 +376,7 @@ class TalkTimeLine extends PureComponent {
 
         
 
-        key = "ctrl + ,"
+        key = "ctrl + 0"
         method = e => {
             let index = this.state.itemIndex
             let item = this.props.dialogue[index]
