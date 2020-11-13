@@ -374,6 +374,24 @@ class TalkTimeLine extends PureComponent {
             method
         })
 
+        
+
+        key = "ctrl + ,"
+        method = e => {
+            let index = this.state.itemIndex
+            let item = this.props.dialogue[index]
+            if(index!=undefined){
+                this.handleChangeTag(item, 0, {"value":"noise","remark":"噪音","color":"red"}, "", item.labels? !item.labels.noise: true)
+
+            }
+        }
+
+        keyboardJS.bind(key, method)
+        keyBindMethods.push({
+            key,
+            method
+        })
+
         key = "ctrl + ]"
         method = e => {
             let index = this.state.itemIndex
