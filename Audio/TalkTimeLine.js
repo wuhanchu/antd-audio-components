@@ -813,17 +813,17 @@ class TalkTimeLine extends PureComponent {
             }
             if(data.charAt(data.length-1)!= '？' && data.charAt(data.length-1)!= '。'&& data.charAt(data.length-1)!= '；' && data.charAt(data.length-1)!= '！')
                 return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
-            var isCanUse = true
-            for(var i=0;i<data.length - 1;i++){
-                if(data[i]===data[0]){
-                }else{
-                    isCanUse= false
-                    break
-                }
-            }
-            if(isCanUse){
-                return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
-            }
+            // var isCanUse = true
+            // for(var i=0;i<data.length - 1;i++){
+            //     if(data[i]===data[0]){
+            //     }else{
+            //         isCanUse= false
+            //         break
+            //     }
+            // }
+            // if(isCanUse){
+            //     return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
+            // }
         }
         
     }
@@ -846,17 +846,17 @@ class TalkTimeLine extends PureComponent {
             if(data.search("】") != -1 ||data.search("【") != -1){
                 return '*【】应为[]'
             }
-            var isCanUse = true
-            for(var i=0;i<data.length - 1;i++){
-                if(data[i]===data[0]){
-                }else{
-                    isCanUse= false
-                    break
-                }
-            }
-            if(isCanUse){
-                return "*请检查是否为无效语音"
-            }
+            // var isCanUse = true
+            // for(var i=0;i<data.length - 1;i++){
+            //     if(data[i]===data[0]){
+            //     }else{
+            //         isCanUse= false
+            //         break
+            //     }
+            // }
+            // if(isCanUse){
+            //     return "*请检查是否为无效语音"
+            // }
         }
     }
 

@@ -103,17 +103,17 @@ class InputMentions extends PureComponent {
             if(data.search("】") != -1 ||data.search("【") != -1){
                 return '*【】应为[]'
             }
-            var isCanUse = true
-            for(var i=0;i<data.length - 1;i++){
-                if(data[i]===data[0]){
-                }else{
-                    isCanUse= false
-                    break
-                }
-            }
-            if(isCanUse){
-                return "*请检查是否为无效语音"
-            }
+            // var isCanUse = true
+            // for(var i=0;i<data.length - 1;i++){
+            //     if(data[i]===data[0]){
+            //     }else{
+            //         isCanUse= false
+            //         break
+            //     }
+            // }
+            // if(isCanUse){
+            //     return "*请检查是否为无效语音"
+            // }
         }
     }
 
