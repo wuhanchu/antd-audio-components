@@ -800,9 +800,9 @@ class TalkTimeLine extends PureComponent {
             //     return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
             // }
             var reg = /[A-Z][A-Z]/g;
-            if(data.match(reg)){
-                return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
-            }
+            // if(data.match(reg)){
+            //     return {...style, border: ' 1px solid red', padding: '4px', fontSize: '14px'}
+            // }
             var regs = /\噢/g
             if(data.search("哎") != -1 ||data.search("噢") != -1){
 
@@ -834,9 +834,9 @@ class TalkTimeLine extends PureComponent {
             //     return "*文字字数超过四十"
             // }
             var reg = /[A-Z][A-Z]/g;
-            if(data.match(reg)){
-                return "*大写字母中间没有空格"
-            }
+            // if(data.match(reg)){
+            //     return "*大写字母中间没有空格"
+            // }
             var regs = /\噢/g
             if(data.search("哎") != -1 ||data.search("噢") != -1){
                 return "*有哎或噢存在请检查是否确定"

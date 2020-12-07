@@ -88,9 +88,9 @@ class InputMentions extends PureComponent {
             //     return "*文字字数超过四十"
             // }
             var reg = /[A-Z][A-Z]/g;
-            if(data.match(reg)){
-                return "*大写字母中间没有空格"
-            }
+            // if(data.match(reg)){
+            //     return "*大写字母中间没有空格"
+            // }
             reg = /\哎/g;
             var regs = /\噢/g
             if(data.search("哎") != -1 ||data.search("噢") != -1){
