@@ -458,6 +458,21 @@ class TalkTimeLine extends PureComponent {
         this.props.onItemChange({ ...item, labels })
     }
 
+    handleChangeRoleTag = (item, index, label, inStyle, mark) =>{
+        const { onLabelChange } = this.props
+        const { remark, value, color = "red", checkFunc, ...others } = label
+        let checked = item.role && item.role[value]
+        if (checkFunc) {
+            checked = checkFunc(item)
+        }
+        let role = { ...item.role }
+        
+        console.log(mark)
+        role=value
+        console.log(mark)
+        this.props.onItemChange &&
+        this.props.onItemChange({ ...item, role })
+    }
     renderTag = (item, index, label, inStyle) => {
         const { onLabelChange } = this.props
 
@@ -482,6 +497,41 @@ class TalkTimeLine extends PureComponent {
                 checked={checked}
                 onChange={(mark) => {
                     this.handleChangeTag(item, index, label, inStyle, mark)
+                    // 数据请求
+                    
+                }}
+            >
+                {remark}
+            </CheckableTag>
+        )
+    }
+
+    renderRoleTag = (item, index, label, inStyle) => {
+        const { onLabelChange } = this.props
+
+        const { remark, value, color = "red", checkFunc, ...others } = label
+        console.log("shishishi", item.role, label)
+        let checked = item.role && item.role==label.value
+        console.log(remark)
+        if (checkFunc) {
+            checked = checkFunc(item)
+        }
+
+        let style = inStyle || {}
+        if (checked) {
+            style.backgroundColor = color
+        } else {
+            style.backgroundColor = "lightgray"
+        }
+
+        return (
+            <CheckableTag
+                style={style}
+                key={value}
+                color={"red"}
+                checked={checked}
+                onChange={(mark) => {
+                    this.handleChangeRoleTag(item, index, label, inStyle, mark)
                     // 数据请求
                     
                 }}
@@ -528,8 +578,8 @@ class TalkTimeLine extends PureComponent {
      * @param isLast is last item
      */
     renderInfo(item, index, isLast = false) {
-        const { playId, labels, hideInfo } = this.props
-
+        const { playId, labels, hideInfo, roles } = this.props
+        console.log(this.props)
         if (hideInfo) {
             return null
         }
@@ -551,7 +601,7 @@ class TalkTimeLine extends PureComponent {
                             marginRight: 10
                         }}
                     >
-                        <Col
+                        {/* <Col
                             style={{
                                 marginRight: 8
                             }}
@@ -562,7 +612,7 @@ class TalkTimeLine extends PureComponent {
                                     this.renderUserSelect(item, index)}
                                 </Fragment>
                             )}
-                        </Col>
+                        </Col> */}
                         {!_.isNil(item.startTime) && (
                             <Col>
                                 <h6
@@ -627,7 +677,7 @@ class TalkTimeLine extends PureComponent {
                             <Col style={{ marginLeft: 20 }}>
                                 <h6
                                     style={{
-                                        fontSize: "1.1em",
+                                        fontSize: "1em",
                                         marginRight: 8,
                                         display: "inline"
                                     }}
@@ -638,16 +688,35 @@ class TalkTimeLine extends PureComponent {
                                 {labels.map(label =>
                                     this.renderTag(item, index, label, {})
                                 )}
+                                
+                            </Col>
+                        )}
+        
+                        {!_.isEmpty(roles) && !_.isNil(item.id) && (
+                            <Col style={{ marginLeft: 20 }}>
+                                <h6
+                                    style={{
+                                        fontSize: "1em",
+                                        marginRight: 8,
+                                        display: "inline"
+                                    }}
+                                >
+                                    角色:
+                                </h6>
+                                {roles.map(label =>
+                                    this.renderRoleTag(item, index, label, {})
+                                )}
                             </Col>
                         )}
                     </Row>
                 </Col>
                 {this.props.onItemChange && (
-                    <Col>
+                    <Col style={{marginTop: '1px'}}>
                         <Fragment>
                             {index != 0 && (
                                 <ButtonSpace
                                     size="small"
+                                    
                                     onClick={() => {
                                         const { dialogue } = this.props
                                         let tempDialogue = clone(dialogue)
