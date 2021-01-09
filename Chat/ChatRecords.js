@@ -12,11 +12,10 @@
  * @param {string}
  **/
 
-import React, {Fragment, useEffect} from "react"
-import {Col, Comment, List, Row, Spin, Typography} from "antd"
-import styled from "styled-components"
-import * as lodash from "lodash"
-import style from "../style"
+import React, { Fragment, useEffect } from 'react';
+import { Comment, List, Spin, Typography } from 'antd';
+import styled from 'styled-components';
+import style from '../style';
 
 /**
  * the Chat state
@@ -24,136 +23,125 @@ import style from "../style"
  * @enum
  */
 export const STATUS = {
-    ongoing: "ongoing",
-    suspend: "suspend"
-}
+  ongoing: 'ongoing',
+  suspend: 'suspend',
+};
 
-const {Text} = Typography;
-
+const { Text } = Typography;
 
 const CommentBase = styled(Comment)`
-    & .ant-comment-content-detail {
-        border-radius: 5px;
-        background: ${style.colors.background.gray};
-        padding: 10px;
-        width: fit-content;
-    }
+  & .ant-comment-content-detail {
+    border-radius: 5px;
+    background: ${style.colors.background.gray};
+    padding: 10px;
+    width: fit-content;
+  }
 
-    & .ant-comment-actions {
-        float: right;
-        border-radius: 5px;
-        background: ${style.colors.background.lightBlue};
-        padding: 10px;
-    }
-    & .ant-comment-actions span {
-        padding-right: 0px;
-        color: ${style.colors.text.blue};
-    }
+  & .ant-comment-actions {
+    float: right;
+    border-radius: 5px;
+    background: ${style.colors.background.lightBlue};
+    padding: 10px;
+  }
+  & .ant-comment-actions span {
+    padding-right: 0px;
+    color: ${style.colors.text.blue};
+  }
 
-    & span {
-        word-wrap: break-word;
-        word-break: break-all;
-    }
-`
+  & span {
+    word-wrap: break-word;
+    word-break: break-all;
+  }
+`;
 
 const CommentMy = styled(CommentBase)`
-    padding-right: 40%;
-    margin-top: 12px;
-    & .ant-comment-actions {
-        float: left;
-    }
-`
+  padding-right: 40%;
+  margin-top: 12px;
+  & .ant-comment-actions {
+    float: left;
+  }
+`;
 
 /**
  * my comment
  */
 const CommentClient = styled(CommentBase)`
-    padding-left: 40%;
-    & .ant-comment-avatar {
-        margin-left: 12px;
-    }
-    & .ant-comment-content-detail {
-        margin: auto 0px auto auto;
-    }
-    & .ant-comment-inner {
-        flex-direction: row-reverse;
-    }
-`
+  padding-left: 40%;
+  & .ant-comment-avatar {
+    margin-left: 12px;
+  }
+  & .ant-comment-content-detail {
+    margin: auto 0px auto auto;
+  }
+  & .ant-comment-inner {
+    flex-direction: row-reverse;
+  }
+`;
 
-function ChatRecords({value, iconMy, status, iconInterlocutors, goingTip}) {
-    const data = value.map(item => ({
-        ...item,
-        avatar:
-            (item.role == "my" ? iconMy : iconInterlocutors) ||
-            "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png",
-        content:
-            typeof item.content == "string" ? (
-                <span>{item.content}</span>
-            ) : (
-                item.content
-            ),
-        actions:
-            typeof item.actions == "string"
-                ? [<span>{item.actions}</span>]
-                : item.actions
-    }))
+function ChatRecords({ value, iconMy, status, iconInterlocutors, goingTip }) {
+  const data = value.map((item) => ({
+    ...item,
+    avatar:
+      (item.role == 'my' ? iconMy : iconInterlocutors) ||
+      'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+    content: typeof item.text == 'string' ? <span>{item.text}</span> : item.text,
+    actions: typeof item.actions == 'string' ? [<span>{item.actions}</span>] : item.actions,
+  }));
 
-    /**
-     * 滚动到对应的位置
-     * @param item
-     */
-    const scrollToItem = function (item) {
-        if (!item) {
-            return
-        }
-
-        let anchorElement = document.getElementById("chat_" + item.id)
-        if (anchorElement) {
-            // anchorElement.scrollIntoView()
-        }
+  /**
+   * 滚动到对应的位置
+   * @param item
+   */
+  const scrollToItem = function (item) {
+    if (!item) {
+      return;
     }
 
-    useEffect(() => {
-        console.debug("value", value)
-        // scrollToItem(lodash.last(value))
-    }, [value])
+    let anchorElement = document.getElementById('chat_' + item.id);
+    if (anchorElement) {
+      // anchorElement.scrollIntoView()
+    }
+  };
 
-    return (
-        <Fragment>
-            <List
-                itemLayout="horizontal"
-                dataSource={data}
-                renderItem={item => (
-                    <li>
-                        <div>
-                            {item.role == "my" ? (
-                                <CommentMy
-                                    id={"chat_" + item.id}
-                                    key={item.id}
-                                    actions={item.actions}
-                                    avatar={item.avatar}
-                                    content={item.content}
-                                />
-                            ) : (
-                                <CommentClient
-                                    id={"chat_" + item.id}
-                                    key={item.id}
-                                    actions={item.actions}
-                                    avatar={item.avatar}
-                                    content={item.content}
-                                />
-                            )}
-                        </div>
-                    </li>
-                )}
-            />
-            <Spin spinning={status == STATUS.ongoing} tip={goingTip}>
-                <Comment>
+  useEffect(() => {
+    console.debug('value', value);
+    // scrollToItem(lodash.last(value))
+  }, [value]);
 
-                </Comment>
-            </Spin>
-        </Fragment>
-    )
+  return (
+    <Fragment>
+      <List
+        itemLayout="horizontal"
+        dataSource={data}
+        renderItem={(item) => (
+          <li>
+            <div>
+              {item.role == 'my' ? (
+                <CommentMy
+                  id={'chat_' + item.id}
+                  key={item.id}
+                  actions={item.actions}
+                  avatar={item.avatar}
+                  content={item.text}
+                />
+              ) : (
+                <CommentClient
+                  id={'chat_' + item.id}
+                  key={item.id}
+                  actions={item.actions}
+                  avatar={item.avatar}
+                  content={item.text}
+                />
+              )}
+            </div>
+          </li>
+        )}
+      />
+      <Spin spinning={status == STATUS.ongoing} tip={goingTip}>
+        <Comment></Comment>
+      </Spin>
+    </Fragment>
+  );
 }
 
-export default React.memo(ChatRecords)
+export default React.memo(ChatRecords);
