@@ -917,14 +917,19 @@ class TalkTimeLine extends PureComponent {
                 }}
                 ref={(ref) => (this.mention = ref)}
                 hotWordList={hotWordList}
-                // onBlur={(item) => {}}
+                onBlur={(item) => {
+                    console.log('onBlur')
+                    this.props.handleChangeisFocus(false)
+                }}
                 onFocus={() => {
+                    console.log('onFocus')
                     this.setState({ itemIndex: index });
                     if (item.id !== this.props.changeId) {
                         this.setChangeId(item.id, () => {
                             this.props.onPauseChange(false);
                         });
                     }
+                    this.props.handleChangeisFocus(true)
                 }}
                 onChange={(changeItem) => {
                     if (changeItem.text !== item.text) {
