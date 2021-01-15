@@ -448,8 +448,15 @@ class TalkTimeLine extends PureComponent {
         if (checkFunc) {
             checkFunc(item);
         }
+        console.log("handleChangeRoleTag")
+        console.log(item.role)
+        console.log(value)
+
         let role = { ...item.role };
         role = value;
+        if(item.role === value){
+            role= null
+        }
         if(this.props.onItemChange) {
             this.props.onItemChange({...item, role});
         }
