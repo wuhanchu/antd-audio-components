@@ -43,13 +43,13 @@ class InputMentions extends PureComponent {
         const optionPrefix = [];
         if(hotWordList){
             hotWordList.forEach((items) => {
-                if (!items.hotWord) {
+                if (!items) {
                     return;
                 }
-                optionPrefix.push(items.hotWord.substr(0, 1));
+                optionPrefix.push(items.substr(0, 1));
             });
         }
-        this.state.optionPrefix = optionPrefix;
+        this.state.optionPrefix = Array.from(new Set(optionPrefix));
         this.state.changeText = item.text;
     }
 
@@ -60,14 +60,12 @@ class InputMentions extends PureComponent {
     getHotWordOptions = () => {
         const options = [];
         if(this.props.hotWordList){
-            this.props.hotWordList.forEach((items) => {
-                if(items.hotWord){
+            this.props.hotWordList.forEach((items,index) => {
                     options.push(
-                        <Mentions.Option key Option item={items.id} value={items.hotWord.substr(1)}>
-                            {items.hotWord}
+                        <Mentions.Option key={index} Option value={items.substr(1)}>
+                            {items}
                         </Mentions.Option>,
                     );
-                }
             });
         }
         return options;
