@@ -21,12 +21,17 @@ import Cursor from 'wavesurfer.js/dist/plugin/wavesurfer.cursor';
 import keyboardJS from 'keyboardjs';
 
 import * as lodash from 'lodash';
-import { MARK_ACTIONS } from '@/pages/mark/components/MarkItem';
+// import { MARK_ACTIONS } from '@/pages/mark/components/MarkItem';
 
 const ButtonGroup = Button.Group;
 
 // const keyboardJS = window.keyboardJS
 
+const MARK_ACTIONS = {
+    mark: 'mark', // 标注
+    inspection: 'inspection', // 检查
+    view: 'view', // 查看
+};
 /**
  * Random RGBA color.
  */
