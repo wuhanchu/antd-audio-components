@@ -419,6 +419,51 @@ class TalkTimeLine extends PureComponent {
             key,
             method,
         });
+
+        key = 'shift + x';
+        method = () => {
+            const index = this.state.itemIndex;
+            // const item = this.props.dialogue[index];
+            if (index !== undefined) {
+                const { dialogue } = this.props;
+                let tempDialogue = clone(dialogue);
+                const item = tempDialogue[index];
+
+                const selectText = document.getSelection().toString();
+
+                // get currentTime to be next item begin time
+                const beginTime = document.wavesurfer.getCurrentTime() * 1000;
+
+                if (item.endTime - beginTime < 250) {
+                    message.warn('拆分间隔太短！');
+                    return;
+                }
+
+                tempDialogue.splice(index + 1, 0, {
+                    ...item,
+                    id: index,
+                    beginTime,
+                    entTime: item.endTime,
+                    text: selectText,
+                });
+                tempDialogue = tempDialogue.map((items, indexs) => {
+                    if (indexs >= index + 1) return { ...items, id: items.id + 1 };
+                    return { ...items };
+                });
+                tempDialogue[index].text = item.text && item.text.replace(selectText, '');
+                tempDialogue[index].endTime = beginTime;
+                this.setChangeId(null, () => {
+                    this.props.onDialogueChange(tempDialogue, index);
+                });
+                                    
+            }
+        };
+
+        keyboardJS.bind(key, method);
+        keyBindMethods.push({
+            key,
+            method,
+        });
     };
 
     /**
