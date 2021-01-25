@@ -797,6 +797,20 @@ class TalkTimeLine extends PureComponent {
                                 </Col>
                             </Fragment>
                         )}
+                        {!_.isEmpty(roles) && !_.isNil(item.id) && (
+                            <Col style={{ marginLeft: 20 }}>
+                                <h6
+                                    style={{
+                                        fontSize: '1em',
+                                        marginRight: 8,
+                                        display: 'inline',
+                                    }}
+                                >
+                                    角色:
+                                </h6>
+                                {roles.map((label) => this.renderRoleTag(item, index, label, {}))}
+                            </Col>
+                        )}
                         {!_.isEmpty(labels) && !_.isNil(item.id) && (
                             <Col style={{ marginLeft: 20 }}>
                                 <h6
@@ -813,20 +827,7 @@ class TalkTimeLine extends PureComponent {
                             </Col>
                         )}
 
-                        {!_.isEmpty(roles) && !_.isNil(item.id) && (
-                            <Col style={{ marginLeft: 20 }}>
-                                <h6
-                                    style={{
-                                        fontSize: '1em',
-                                        marginRight: 8,
-                                        display: 'inline',
-                                    }}
-                                >
-                                    角色:
-                                </h6>
-                                {roles.map((label) => this.renderRoleTag(item, index, label, {}))}
-                            </Col>
-                        )}
+  
                     </Row>
                 </Col>
                 {this.props.onItemChange && (
