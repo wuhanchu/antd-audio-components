@@ -345,68 +345,6 @@ class TalkTimeLine extends PureComponent {
             method,
         });
 
-        key = 'ctrl + [';
-        method = () => {
-            const index = this.state.itemIndex;
-            const item = this.props.dialogue[index];
-            if (index !== undefined) {
-                this.handleChangeTag(
-                    item,
-                    0,
-                    { color: 'blue', remark: '男', value: 'man' },
-                    '',
-                    item.labels ? !item.labels.man : true,
-                );
-            }
-        };
-
-        keyboardJS.bind(key, method);
-        keyBindMethods.push({
-            key,
-            method,
-        });
-
-        key = 'ctrl + 0';
-        method = () => {
-            const index = this.state.itemIndex;
-            const item = this.props.dialogue[index];
-            if (index !== undefined) {
-                this.handleChangeTag(
-                    item,
-                    0,
-                    { value: 'noise', remark: '噪音', color: 'red' },
-                    '',
-                    item.labels ? !item.labels.noise : true,
-                );
-            }
-        };
-
-        keyboardJS.bind(key, method);
-        keyBindMethods.push({
-            key,
-            method,
-        });
-
-        key = 'ctrl + ]';
-        method = () => {
-            const index = this.state.itemIndex;
-            const item = this.props.dialogue[index];
-            if (index !== undefined) {
-                this.handleChangeTag(
-                    item,
-                    0,
-                    { color: 'pink', remark: '女', value: 'woman' },
-                    '',
-                    item.labels ? !item.labels.woman : true,
-                );
-            }
-        };
-
-        keyboardJS.bind(key, method);
-        keyBindMethods.push({
-            key,
-            method,
-        });
         // 提交
         key = 'ctrl + enter';
         method = (e) => {
@@ -489,21 +427,54 @@ class TalkTimeLine extends PureComponent {
     };
 
     handleChangeRoleTag = (item, index, label) => {
+        const { dialogue } = this.props
         const { value, checkFunc } = label;
+        // 关联选择角色的性别
+        let customer_servicer_sex
+        let customer_sex
+        for(var i= dialogue.length-1;i>=0;i--){
+            if(dialogue[i].role == 'customer_servicer'){
+                if(dialogue[i].labels.man){
+                    customer_servicer_sex = {man: true}
+                }else if(dialogue[i].labels.woman){
+                    customer_servicer_sex = {woman: true}
+                }else {
+                    customer_servicer_sex = undefined
+                }
+            }
+            
+            if(dialogue[i].role == 'customer'){
+                if(dialogue[i].labels.man){
+                    customer_sex = {man: true}
+                }else if(dialogue[i].labels.woman){
+                    customer_sex = {woman: true}
+                }else {
+                    customer_sex = undefined
+                }
+            }
+        }
         if (checkFunc) {
             checkFunc(item);
         }
-        console.log("handleChangeRoleTag")
-        console.log(item.role)
-        console.log(value)
 
         let role = { ...item.role };
+        let labels = { ...item.labels };
+        labels.man = false
+        labels.woman = false
+
         role = value;
         if(item.role === value){
             role= null
         }
         if(this.props.onItemChange) {
-            this.props.onItemChange({...item, role});
+            if(role==='customer_servicer'){
+                this.props.onItemChange({...item, role, labels: {...labels, ...customer_servicer_sex}});
+            }else if(role==='customer'){
+                this.props.onItemChange({...item, role, labels: {...labels, ...customer_sex}});
+            }else {
+                this.props.onItemChange({...item, role});
+            }
+            
         }
     };
 
