@@ -358,7 +358,7 @@ class TalkTimeLine extends PureComponent {
             method,
         });
 
-        key = 'shift + x';
+        key = 'shift + alt + j';
         method = () => {
             const index = this.state.itemIndex;
             // const item = this.props.dialogue[index];
