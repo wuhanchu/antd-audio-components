@@ -690,10 +690,16 @@ export default class MarkItem extends PureComponent {
         let labels = null;
 
         try {
-            project.role && (role = project.role);
-            project.label && (labels = project.label);
-            console.log("九炼",role, labels)
-
+            if(typeof(project.role)!=='object'){
+                project.role && (role = JSON.parse(project.role));
+            }else{
+                project.role && (role = project.role);
+            }
+            if(typeof(project.label)!=='object'){
+                project.label && (labels = JSON.parse(project.label));
+            }else{
+                project.label && (labels = project.label);
+            }
             this.schema.label = {
                 title: '标签',
                 type: schemaFieldType.Select,
