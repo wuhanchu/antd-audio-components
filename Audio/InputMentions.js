@@ -2,6 +2,9 @@ import React, { PureComponent } from 'react';
 
 import { Mentions } from 'antd';
 
+function unique(arr) {
+    return Array.from(new Set(arr))
+}
 /**
  * 输入提示
  */
@@ -41,11 +44,16 @@ class InputMentions extends PureComponent {
         super(props);
 
         const { item, hotWordList } = props;
+        let wordList = undefined
+        if(hotWordList.length){
+            wordList = unique(hotWordList)
+        }
+        console.log(wordList.join('|'))
         let data = {}
         const optionPrefix = [];
-        if(hotWordList.length){
-            this.state.prefix = hotWordList[0].substr(0, 1)
-            hotWordList.forEach((items) => {
+        if(wordList.length){
+            this.state.prefix = wordList[0].substr(0, 1)
+            wordList.forEach((items) => {
                 if (!items) {
                     return;
                 }
@@ -56,7 +64,7 @@ class InputMentions extends PureComponent {
         this.state.optionPrefix = Array.from(new Set(optionPrefix));
         Array.from(new Set(optionPrefix)).map((item)=>{
             data[item] = []
-            hotWordList.length && hotWordList.map((list)=>{
+            wordList.length && wordList.map((list)=>{
                 if(list.substr(0, 1) === item){
                     data[item].push(<Option key={list.substr(1)} value={list.substr(1)}>
                         {list}
@@ -64,14 +72,6 @@ class InputMentions extends PureComponent {
                 }
             })
         })
-        
-        // if(hotWordList){
-        //     {(data[prefix] || []).map(value => (
-        //         options.push(<Option key={value.substr(1)} value={value.substr(1)}>
-        //           {value}
-        //         </Option>)
-        //       ))}
-        // }
 
         this.state.changeText = item.text;
         this.state.data =data

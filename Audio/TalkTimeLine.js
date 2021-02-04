@@ -434,9 +434,9 @@ class TalkTimeLine extends PureComponent {
         let customer_sex
         for(var i= dialogue.length-1;i>=0;i--){
             if(dialogue[i].role == 'customer_servicer'){
-                if(dialogue[i].labels.man){
+                if(dialogue[i].labels && dialogue[i].labels.man){
                     customer_servicer_sex = {man: true}
-                }else if(dialogue[i].labels.woman){
+                }else if(dialogue[i].labels && dialogue[i].labels.woman){
                     customer_servicer_sex = {woman: true}
                 }else {
                     customer_servicer_sex = undefined
@@ -444,9 +444,9 @@ class TalkTimeLine extends PureComponent {
             }
             
             if(dialogue[i].role == 'customer'){
-                if(dialogue[i].labels.man){
+                if(dialogue[i].labels && dialogue[i].labels.man){
                     customer_sex = {man: true}
-                }else if(dialogue[i].labels.woman){
+                }else if(dialogue[i].labels&&dialogue[i].labels.woman){
                     customer_sex = {woman: true}
                 }else {
                     customer_sex = undefined
