@@ -33,42 +33,57 @@ class InputMentions extends PureComponent {
     state = {
         changeText: null,
         optionPrefix: [],
+        prefix: "",
+        data: {} 
     };
 
     constructor(props) {
         super(props);
 
         const { item, hotWordList } = props;
-
+        let data = {}
         const optionPrefix = [];
         if(hotWordList){
+            this.state.prefix = hotWordList[2].substr(0, 1)
             hotWordList.forEach((items) => {
                 if (!items) {
                     return;
                 }
                 optionPrefix.push(items.substr(0, 1));
+                
             });
         }
         this.state.optionPrefix = Array.from(new Set(optionPrefix));
+        Array.from(new Set(optionPrefix)).map((item)=>{
+            data[item] = []
+            hotWordList.map((list)=>{
+                if(list.substr(0, 1) === item){
+                    data[item].push(<Option key={list.substr(1)} value={list.substr(1)}>
+                        {list}
+                  </Option>)
+                }
+            })
+        })
+        
+        // if(hotWordList){
+        //     {(data[prefix] || []).map(value => (
+        //         options.push(<Option key={value.substr(1)} value={value.substr(1)}>
+        //           {value}
+        //         </Option>)
+        //       ))}
+        // }
+
         this.state.changeText = item.text;
+        this.state.data =data
     }
 
     /**
      * 获取热词选项
      * @returns {[]}
      */
-    getHotWordOptions = () => {
-        const options = [];
-        if(this.props.hotWordList){
-            this.props.hotWordList.forEach((items,index) => {
-                    options.push(
-                        <Mentions.Option key={index} Option value={items.substr(1)}>
-                            {items}
-                        </Mentions.Option>,
-                    );
-            });
-        }
-        return options;
+    getHotWordOptions = (prefix) => {
+        const { data } = this.state;
+        return data[prefix];
     };
 
     handleInputData(data) {
@@ -93,7 +108,12 @@ class InputMentions extends PureComponent {
         return null
     }
 
+    onSearch = (_, prefix) => {
+        this.setState({ prefix });
+      };
+
     render() {
+        const { prefix } = this.state;
         const { onChange, onBlur, index, onFocus, item, style, mention } = this.props;
         const { changeText, optionPrefix } = this.state;
 
@@ -102,7 +122,6 @@ class InputMentions extends PureComponent {
         const nowrapHeight = textSize('1.1em', '', changeText, document.body.clientWidth, 'nowrap')
             .height;
         const rows = normalHeight / nowrapHeight;
-
         return (
             <>
                 <Mentions
@@ -120,25 +139,31 @@ class InputMentions extends PureComponent {
                             onBlur(item);
                         }
                     }}
+                    
                     onFocus={() => {
                         if(onFocus){
                             onFocus(item);
                         }
                     }}
+                    onSearch={this.onSearch}
                     autoFocus
                     onChange={(changeText) => this.setState({ changeText })}
                     split=""
-                    filterOption={(input, option) => {
-                        for (let i = 1; i < option.children.length; i++) {
-                            return changeText.endsWith(option.children.substr(0, i));
-                        }
-                        return null
-                    }}
+                    // filterOption={(input, option) => {
+                    //     console.log(changeText)
+                    //     console.log(option.children)
+
+                    //     for (let i = 1; i < option.children.length; i++) {
+                    //         return changeText.endsWith(option.children.substr(0, i));
+                    //     }
+                    //     return null
+                    // }}
                     style={style}
                     prefix={optionPrefix}
-                    validateSearch={() => optionPrefix.some((item) => changeText.endsWith(item))}
+                    // validateSearch={() => optionPrefix.some((item) =>{console.log(item) 
+                    //     return changeText.endsWith(item)})}
                 >
-                    {this.getHotWordOptions()}
+                    {this.getHotWordOptions(this.state.prefix)}
                 </Mentions>
                 {this.props.showTips && (
                     <span style={{ color: 'red', marginTop: '5px', display: 'block' }}>
