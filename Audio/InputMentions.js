@@ -48,7 +48,6 @@ class InputMentions extends PureComponent {
         if(hotWordList.length){
             wordList = unique(hotWordList)
         }
-        console.log(wordList.join('|'))
         let data = {}
         const optionPrefix = [];
         if(wordList.length){
