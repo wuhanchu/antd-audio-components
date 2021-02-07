@@ -50,7 +50,7 @@ class InputMentions extends PureComponent {
         }
         let data = {}
         const optionPrefix = [];
-        if(wordList.length){
+        if(wordList && wordList.length){
             this.state.prefix = wordList[0].substr(0, 1)
             wordList.forEach((items) => {
                 if (!items) {
@@ -63,7 +63,7 @@ class InputMentions extends PureComponent {
         this.state.optionPrefix = Array.from(new Set(optionPrefix));
         Array.from(new Set(optionPrefix)).map((item)=>{
             data[item] = []
-            wordList.length && wordList.map((list)=>{
+            wordList && wordList.length && wordList.map((list)=>{
                 if(list.substr(0, 1) === item){
                     data[item].push(<Option key={list.substr(1)} value={list.substr(1)}>
                         {list}
