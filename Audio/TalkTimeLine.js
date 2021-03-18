@@ -1,14 +1,15 @@
-import React, {Fragment, PureComponent} from 'react';
-import {Icon as LegacyIcon} from '@ant-design/compatible';
-import {SyncOutlined} from '@ant-design/icons';
-import {Card, Col, message, Row, Spin, Timeline, Typography} from 'antd';
-import {antdUtils, frSchema} from '@/outter';
+import React, { Fragment, PureComponent } from 'react';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { SyncOutlined } from '@ant-design/icons';
+import { Card, Col, message, Row, Spin, Timeline, Typography } from 'antd';
+import { antdUtils, frSchema } from '@/outter';
 import InputMentions from '@/components/Extra/Audio/InputMentions';
 import CheckableTag from 'antd/es/tag/CheckableTag';
 import ButtonSpace from '@/components/Extra/Button/ButtonSpace';
 import clone from 'clone';
 import * as _ from 'lodash';
 import keyboardJS from 'keyboardjs';
+import Immutable from 'seamless-immutable';
 
 const { createComponent } = antdUtils.utils.component;
 const { actions, schemaFieldType, utils } = frSchema;
@@ -90,11 +91,10 @@ class TalkTimeLine extends PureComponent {
     componentDidUpdate(prevProps) {
         // play 切换
         if (this.props.playId !== prevProps.playId) {
-            !_.isNil(this.props.playId)
+            !_.isNil(this.props.playId);
             try {
                 this.scrollToItem(this.dialogueMap[this.props.playId].item);
-            } catch (error) {
-            }
+            } catch (error) {}
         }
 
         if (this.props.dialogue !== prevProps.dialogue) {
@@ -114,14 +114,14 @@ class TalkTimeLine extends PureComponent {
      */
     setChangeId(changeId, callback) {
         if (this.state.changeId !== changeId) {
-            if(this.mention){
+            if (this.mention) {
                 this.mention.blur();
             }
         }
 
         this.setState({ changeId }, () => {
             if (this.state.changeId !== this.props.changeId) {
-                if(this.props.onChangeIdChange){
+                if (this.props.onChangeIdChange) {
                     this.props.onChangeIdChange(this.state.changeId);
                 }
             }
@@ -130,12 +130,11 @@ class TalkTimeLine extends PureComponent {
             }
 
             this.props.onChangeIdChange(this.state.changeId);
-            if(callback){
+            if (callback) {
                 callback();
             }
         });
     }
-
 
     componentWillUnmount = () => {
         this.keyBindMethods.forEach(({ key, method }) => {
@@ -144,7 +143,7 @@ class TalkTimeLine extends PureComponent {
     };
 
     setDialogueMap() {
-        if(this.props.dialogue) {
+        if (this.props.dialogue) {
             this.props.dialogue.forEach((item, index) => {
                 this.dialogueMap[item.id] = {
                     item,
@@ -164,7 +163,7 @@ class TalkTimeLine extends PureComponent {
             if (event.shiftKey && event.altKey) {
                 return false;
             }
-            return null
+            return null;
         };
 
         node.onclick = (event) => {
@@ -214,7 +213,6 @@ class TalkTimeLine extends PureComponent {
 
             if (!nextItem) {
                 this.setChangeId(null);
-
                 return;
             }
             if (nextItem.id === 0 && !this.dialogueMap[1]) {
@@ -284,11 +282,15 @@ class TalkTimeLine extends PureComponent {
                 lastItem.endTime = item.endTime;
                 lastItem.beginTime =
                     lastItem.beginTime < item.beginTime ? lastItem.beginTime : item.beginTime;
-                lastItem.endTime = lastItem.endTime >= item.endTime ? lastItem.endTime : item.endTime;
+                lastItem.endTime =
+                    lastItem.endTime >= item.endTime ? lastItem.endTime : item.endTime;
                 lastItem.text =
-                    (_.isNil(lastItem.text) ? '' : lastItem.text) + (_.isNil(item.text) ? '' : item.text);
+                    (_.isNil(lastItem.text) ? '' : lastItem.text) +
+                    (_.isNil(item.text) ? '' : item.text);
                 tempDialogue.splice(index, 1);
-                this.setChangeId(null, () => this.props.onDialogueChange(tempDialogue, lastItem.id));
+                this.setChangeId(null, () =>
+                    this.props.onDialogueChange(tempDialogue, lastItem.id),
+                );
             }
         };
         keyboardJS.bind(key, method);
@@ -312,9 +314,11 @@ class TalkTimeLine extends PureComponent {
                 }
                 nextItem.beginTime =
                     item.beginTime < nextItem.beginTime ? item.beginTime : nextItem.beginTime;
-                nextItem.endTime = item.endTime >= nextItem.endTime ? item.endTime : nextItem.endTime;
+                nextItem.endTime =
+                    item.endTime >= nextItem.endTime ? item.endTime : nextItem.endTime;
                 nextItem.text =
-                    (_.isNil(item.text) ? '' : item.text) + (_.isNil(nextItem.text) ? '' : nextItem.text);
+                    (_.isNil(item.text) ? '' : item.text) +
+                    (_.isNil(nextItem.text) ? '' : nextItem.text);
 
                 tempDialogue.splice(index, 1);
                 this.setChangeId(null, () => {
@@ -393,7 +397,6 @@ class TalkTimeLine extends PureComponent {
                 this.setChangeId(null, () => {
                     this.props.onDialogueChange(tempDialogue, index);
                 });
-                                    
             }
         };
 
@@ -421,66 +424,82 @@ class TalkTimeLine extends PureComponent {
         }
         const labels = { ...item.labels };
         labels[value] = mark;
-        if(this.props.onItemChange) {
-            this.props.onItemChange({...item, labels});
+        if (this.props.onItemChange) {
+            this.props.onItemChange({ ...item, labels });
         }
     };
 
     handleChangeRoleTag = (item, index, label) => {
-        const { dialogue } = this.props
+        const { dialogue } = this.props;
         const { value, checkFunc } = label;
         // 关联选择角色的性别
-        let customer_servicer_sex
-        let customer_sex
-        for(var i= dialogue.length-1;i>=0;i--){
-            if(dialogue[i].role == 'customer_servicer'){
-                if(dialogue[i].labels && dialogue[i].labels.man){
-                    customer_servicer_sex = {man: true}
-                }else if(dialogue[i].labels && dialogue[i].labels.woman){
-                    customer_servicer_sex = {woman: true}
-                }else {
-                    customer_servicer_sex = undefined
+        let customer_servicer_sex;
+        let customer_sex;
+        if (this.props.nchannels !== 2) {
+            for (let i = dialogue.length - 1; i >= 0; i--) {
+                if (dialogue[i].role === 'customer_servicer') {
+                    if (dialogue[i].labels && dialogue[i].labels.man) {
+                        customer_servicer_sex = { man: true };
+                    } else if (dialogue[i].labels && dialogue[i].labels.woman) {
+                        customer_servicer_sex = { woman: true };
+                    } else {
+                        customer_servicer_sex = undefined;
+                    }
+                }
+
+                if (dialogue[i].role === 'customer') {
+                    if (dialogue[i].labels && dialogue[i].labels.man) {
+                        customer_sex = { man: true };
+                    } else if (dialogue[i].labels && dialogue[i].labels.woman) {
+                        customer_sex = { woman: true };
+                    } else {
+                        customer_sex = undefined;
+                    }
                 }
             }
-            
-            if(dialogue[i].role == 'customer'){
-                if(dialogue[i].labels && dialogue[i].labels.man){
-                    customer_sex = {man: true}
-                }else if(dialogue[i].labels&&dialogue[i].labels.woman){
-                    customer_sex = {woman: true}
-                }else {
-                    customer_sex = undefined
+            if (checkFunc) {
+                checkFunc(item);
+            }
+            let role = { ...item.role };
+            const labels = { ...item.labels };
+            labels.man = false;
+            labels.woman = false;
+
+            role = value;
+            if (item.role === value) {
+                role = null;
+            }
+            if (this.props.onItemChange) {
+                if (role === 'customer_servicer') {
+                    this.props.onItemChange({
+                        ...item,
+                        role,
+                        labels: { ...labels, ...customer_servicer_sex },
+                    });
+                } else if (role === 'customer') {
+                    this.props.onItemChange({
+                        ...item,
+                        role,
+                        labels: { ...labels, ...customer_sex },
+                    });
+                } else {
+                    this.props.onItemChange({ ...item, role });
                 }
             }
-        }
-        if (checkFunc) {
-            checkFunc(item);
-        }
-
-        let role = { ...item.role };
-        let labels = { ...item.labels };
-        labels.man = false
-        labels.woman = false
-
-        role = value;
-        if(item.role === value){
-            role= null
-        }
-        if(this.props.onItemChange) {
-            if(role==='customer_servicer'){
-                this.props.onItemChange({...item, role, labels: {...labels, ...customer_servicer_sex}});
-            }else if(role==='customer'){
-                this.props.onItemChange({...item, role, labels: {...labels, ...customer_sex}});
-            }else {
-                this.props.onItemChange({...item, role});
-            }
-            
+        } else {
+            let dialogueArr = Immutable.asMutable(this.props.dialogue);
+            dialogueArr = dialogueArr.map((items) => {
+                if (items.channel_id === item.channel_id) {
+                    return { ...items, role: value };
+                }
+                return { ...items };
+            });
+            this.props.handleChangeDialogue(Immutable(dialogueArr));
         }
     };
 
     renderTag = (item, index, label, inStyle) => {
-
-        const { remark, value, color = 'red', checkFunc, } = label;
+        const { remark, value, color = 'red', checkFunc } = label;
         let checked = item.labels && item.labels[value];
         if (checkFunc) {
             checked = checkFunc(item);
@@ -510,7 +529,7 @@ class TalkTimeLine extends PureComponent {
     };
 
     renderRoleTag = (item, index, label, inStyle) => {
-        const { remark, value, color = 'red', checkFunc, } = label;
+        const { remark, value, color = 'red', checkFunc } = label;
         let checked = item.role && item.role === label.value;
         if (checkFunc) {
             checked = checkFunc(item);
@@ -539,10 +558,6 @@ class TalkTimeLine extends PureComponent {
         );
     };
 
-
-
-
-
     handleInputCheck(data, style) {
         if (!this.props.showTips) {
             return null;
@@ -562,7 +577,7 @@ class TalkTimeLine extends PureComponent {
             )
                 return { ...style, border: ' 1px solid red', padding: '4px', fontSize: '14px' };
         }
-        return null
+        return null;
     }
 
     handleInputData = (data) => {
@@ -574,14 +589,14 @@ class TalkTimeLine extends PureComponent {
                 data.charAt(data.length - 1) !== '？' &&
                 data.charAt(data.length - 1) !== '。' &&
                 data.charAt(data.length - 1) !== '；' &&
-                data.charAt(data.length - 1) !=='！'
+                data.charAt(data.length - 1) !== '！'
             )
                 return '*句末符号出错';
             if (data.search('】') !== -1 || data.search('【') !== -1) {
                 return '*【】应为[]';
             }
         }
-        return null
+        return null;
     };
 
     /**
@@ -611,14 +626,14 @@ class TalkTimeLine extends PureComponent {
                 </div>
                 {this.props.showTips && (
                     <span style={{ color: 'red', marginTop: '5px', display: 'block' }}>
-            {this.handleInputData(item.text && item.text.trim())}
-          </span>
+                        {this.handleInputData(item.text && item.text.trim())}
+                    </span>
                 )}
             </div>
         );
     }
 
-    isElementVisible= (el) => {
+    isElementVisible = (el) => {
         const rect = el.getBoundingClientRect();
         const vWidth = window.innerWidth || document.documentElement.clientWidth;
         const vHeight = window.innerHeight || document.documentElement.clientHeight;
@@ -627,7 +642,8 @@ class TalkTimeLine extends PureComponent {
         };
 
         // Return false if it's not in the viewport
-        if (rect.right < 0 || rect.bottom < 0 || rect.left > vWidth || rect.top > vHeight) return false;
+        if (rect.right < 0 || rect.bottom < 0 || rect.left > vWidth || rect.top > vHeight)
+            return false;
 
         // Return true if any of its four corners are visible
         return (
@@ -643,7 +659,7 @@ class TalkTimeLine extends PureComponent {
      * @param item
      */
     scrollToItem = (item) => {
-        const anchorElement = document.getElementById(`timeline_${  item.id}`);
+        const anchorElement = document.getElementById(`timeline_${item.id}`);
 
         if (anchorElement && !this.isElementVisible(anchorElement)) {
             anchorElement.scrollIntoView();
@@ -732,14 +748,19 @@ class TalkTimeLine extends PureComponent {
                                     时间区间:
                                 </h6>
                                 {utils.moment.getTimeShow(item.beginTime)}
-                                {!_.isNil(item.endTime) && ` - ${  utils.moment.getTimeShow(item.endTime)}`}
+                                {!_.isNil(item.endTime) &&
+                                    ` - ${utils.moment.getTimeShow(item.endTime)}`}
                             </Col>
                         )}
                         {!_.isNil(item.id) && !_.isNil(item.beginTime) && (
                             <Fragment>
                                 <Col>
                                     <LegacyIcon
-                                        type={playId === item.id && !this.props.pause ? 'stop' : 'play-circle'}
+                                        type={
+                                            playId === item.id && !this.props.pause
+                                                ? 'stop'
+                                                : 'play-circle'
+                                        }
                                         style={{
                                             marginTop: '4px',
                                             fontSize: '1.1em',
@@ -757,7 +778,7 @@ class TalkTimeLine extends PureComponent {
                                     />
                                 </Col>
                                 <Col>
-                                    {playId === item.id && !this.props.pause && (
+                                    {playId === item.id && (
                                         <SyncOutlined
                                             style={{
                                                 fontSize: '1.1em',
@@ -797,8 +818,6 @@ class TalkTimeLine extends PureComponent {
                                 {labels.map((label) => this.renderTag(item, index, label, {}))}
                             </Col>
                         )}
-
-  
                     </Row>
                 </Col>
                 {this.props.onItemChange && (
@@ -810,13 +829,28 @@ class TalkTimeLine extends PureComponent {
                                     onClick={() => {
                                         const { dialogue } = this.props;
                                         let tempDialogue = clone(dialogue);
-                                        const lastItem = tempDialogue[index - 1];
+                                        let indexiii = 0
+                                        let temp = tempDialogue.filter((item) => {
+                                            return (
+                                                item.channel_id === dialogue[index].channel_id
+                                            );
+                                        })
+                                        temp.map((item,indexsss)=>{
+                                            if (dialogue[index].id === item.id){
+                                                indexiii = indexsss
+                                            }
+                                        })
+                                        const lastItem = temp[indexiii - 1];
                                         lastItem.endTime = item.endTime;
 
                                         lastItem.beginTime =
-                                            lastItem.beginTime < item.beginTime ? lastItem.beginTime : item.beginTime;
+                                            lastItem.beginTime < item.beginTime
+                                                ? lastItem.beginTime
+                                                : item.beginTime;
                                         lastItem.endTime =
-                                            lastItem.endTime >= item.endTime ? lastItem.endTime : item.endTime;
+                                            lastItem.endTime >= item.endTime
+                                                ? lastItem.endTime
+                                                : item.endTime;
 
                                         lastItem.text =
                                             (_.isNil(lastItem.text) ? '' : lastItem.text) +
@@ -825,7 +859,8 @@ class TalkTimeLine extends PureComponent {
                                         tempDialogue.splice(index, 1);
 
                                         tempDialogue = tempDialogue.map((items, indexs) => {
-                                            if (indexs >= index) return { ...items, id: items.id - 1 };
+                                            if (indexs >= index)
+                                                return { ...items, id: items.id - 1 };
                                             return { ...items };
                                         });
 
@@ -849,16 +884,21 @@ class TalkTimeLine extends PureComponent {
                                             return;
                                         }
                                         nextItem.beginTime =
-                                            item.beginTime < nextItem.beginTime ? item.beginTime : nextItem.beginTime;
+                                            item.beginTime < nextItem.beginTime
+                                                ? item.beginTime
+                                                : nextItem.beginTime;
                                         nextItem.endTime =
-                                            item.endTime >= nextItem.endTime ? item.endTime : nextItem.endTime;
+                                            item.endTime >= nextItem.endTime
+                                                ? item.endTime
+                                                : nextItem.endTime;
                                         nextItem.text =
                                             (_.isNil(item.text) ? '' : item.text) +
                                             (_.isNil(nextItem.text) ? '' : nextItem.text);
 
                                         tempDialogue.splice(index, 1);
                                         tempDialogue = tempDialogue.map((items, indexs) => {
-                                            if (indexs >= index) return { ...items, id: items.id - 1 };
+                                            if (indexs >= index)
+                                                return { ...items, id: items.id - 1 };
                                             return { ...items };
                                         });
                                         this.setChangeId(null, () => {
@@ -881,7 +921,8 @@ class TalkTimeLine extends PureComponent {
                                         const selectText = document.getSelection().toString();
 
                                         // get currentTime to be next item begin time
-                                        const beginTime = document.wavesurfer.getCurrentTime() * 1000;
+                                        const beginTime =
+                                            document.wavesurfer.getCurrentTime() * 1000;
 
                                         if (item.endTime - beginTime < 250) {
                                             message.warn('拆分间隔太短！');
@@ -896,10 +937,12 @@ class TalkTimeLine extends PureComponent {
                                             text: selectText,
                                         });
                                         tempDialogue = tempDialogue.map((items, indexs) => {
-                                            if (indexs >= index + 1) return { ...items, id: items.id + 1 };
+                                            if (indexs >= index + 1)
+                                                return { ...items, id: items.id + 1 };
                                             return { ...items };
                                         });
-                                        tempDialogue[index].text = item.text && item.text.replace(selectText, '');
+                                        tempDialogue[index].text =
+                                            item.text && item.text.replace(selectText, '');
                                         tempDialogue[index].endTime = beginTime;
                                         this.setChangeId(null, () => {
                                             this.props.onDialogueChange(tempDialogue, index);
@@ -910,7 +953,9 @@ class TalkTimeLine extends PureComponent {
                                 </ButtonSpace>
                             )}
                             {(item.endTime - item.beginTime) / 1000 > 10 ? (
-                                <span style={{ color: 'red', marginTop: '5px' }}>*音频段超过十秒请拆分</span>
+                                <span style={{ color: 'red', marginTop: '5px' }}>
+                                    *音频段超过十秒请拆分
+                                </span>
                             ) : (
                                 ''
                             )}
@@ -942,18 +987,18 @@ class TalkTimeLine extends PureComponent {
                 ref={(ref) => (this.mention = ref)}
                 hotWordList={hotWordList}
                 onBlur={(item) => {
-                    console.log('onBlur')
-                    this.props.handleChangeisFocus(false)
+                    console.log('onBlur');
+                    this.props.handleChangeisFocus(false);
                 }}
                 onFocus={() => {
-                    console.log('onFocus')
+                    console.log('onFocus');
                     this.setState({ itemIndex: index });
                     if (item.id !== this.props.changeId) {
                         this.setChangeId(item.id, () => {
                             this.props.onPauseChange(false);
                         });
                     }
-                    this.props.handleChangeisFocus(true)
+                    this.props.handleChangeisFocus(true);
                 }}
                 onChange={(changeItem) => {
                     if (changeItem.text !== item.text) {
@@ -976,8 +1021,8 @@ class TalkTimeLine extends PureComponent {
                     return (
                         <Timeline.Item
                             key={item.id || index}
-                            id={`timeline_${  item.id}`}
-                            dot={running &&  index === dialogue.length ? <Spin /> : null}
+                            id={`timeline_${item.id}`}
+                            dot={running && index === dialogue.length ? <Spin /> : null}
                         >
                             <Card
                                 bordered={false}
@@ -996,7 +1041,11 @@ class TalkTimeLine extends PureComponent {
         });
 
         return (
-            <Timeline id="timeline" reverse={reverse} style={{ ...this.props.style, width: '100%' }}>
+            <Timeline
+                id="timeline"
+                reverse={reverse}
+                style={{ ...this.props.style, width: '100%' }}
+            >
                 {itemList}
             </Timeline>
         );

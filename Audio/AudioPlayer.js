@@ -63,6 +63,7 @@ class AudioPlayer extends PureComponent {
         super(props);
         this.setDialogueMap();
         this.bindKey();
+        this.wavesurfer = {};
     }
 
     /**
@@ -78,7 +79,7 @@ class AudioPlayer extends PureComponent {
                 return;
             }
             e.preventDefault();
-            this.wavesurfer.skipBackward(1);
+            this.wavesurfer.C0.skipBackward(1);
         };
         keyboardJS.bind(key, method);
         this.keyBindMethods.push({ key, method });
@@ -89,7 +90,7 @@ class AudioPlayer extends PureComponent {
                 return;
             }
             e.preventDefault();
-            this.wavesurfer.skip(1);
+            this.wavesurfer.C0.skip(1);
         };
         keyboardJS.bind(key, method);
 
@@ -99,11 +100,11 @@ class AudioPlayer extends PureComponent {
         key = 'shift+alt+up';
         method = (e) => {
             e.preventDefault();
-            const rate = this.wavesurfer.getPlaybackRate();
+            const rate = this.wavesurfer.C0.getPlaybackRate();
             if (rate >= 2) {
                 return;
             }
-            this.wavesurfer.setPlaybackRate(rate + 0.2);
+            this.wavesurfer.C0.setPlaybackRate(rate + 0.2);
         };
         keyboardJS.bind(key, method);
         this.keyBindMethods.push({ key, method });
@@ -112,11 +113,11 @@ class AudioPlayer extends PureComponent {
         key = 'shift+alt+down';
         method = (e) => {
             e.preventDefault();
-            const rate = this.wavesurfer.getPlaybackRate();
+            const rate = this.wavesurfer.C0.getPlaybackRate();
             if (rate <= 0.4) {
                 return;
             }
-            this.wavesurfer.setPlaybackRate(rate - 0.2);
+            this.wavesurfer.C0.setPlaybackRate(rate - 0.2);
         };
         keyboardJS.bind(key, method);
         this.keyBindMethods.push({ key, method });
@@ -131,11 +132,11 @@ class AudioPlayer extends PureComponent {
 
             const region = this.regions[this.props.changeId];
 
-            if (region && this.wavesurfer.getCurrentTime() - 1 <= region.start) {
+            if (region && this.wavesurfer.C0.getCurrentTime() - 1 <= region.start) {
                 return;
             }
 
-            this.wavesurfer.skipBackward(0.3);
+            this.wavesurfer.C0.skipBackward(0.3);
         };
         keyboardJS.bind(key, method);
         this.keyBindMethods.push({ key, method });
@@ -149,11 +150,11 @@ class AudioPlayer extends PureComponent {
             e.preventDefault();
 
             const region = this.regions[this.props.changeId];
-            if (region && this.wavesurfer.getCurrentTime() + 1 >= region.end) {
+            if (region && this.wavesurfer.C0.getCurrentTime() + 1 >= region.end) {
                 return;
             }
 
-            this.wavesurfer.skip(1);
+            this.wavesurfer.C0.skip(1);
         };
         keyboardJS.bind(key, method);
         this.keyBindMethods.push({ key, method });
@@ -163,20 +164,20 @@ class AudioPlayer extends PureComponent {
         this.keyBindMethods.forEach(({ key, method }) => {
             keyboardJS.unbind(key, method);
         });
-        if(this.wavesurfer){
-            this.wavesurfer.destroy();
+        if (this.wavesurfer.C0) {
+            this.wavesurfer.C0.destroy();
+        }
+        if (this.wavesurfer.C1) {
+            this.wavesurfer.C1.destroy();
         }
     };
 
     componentDidMount() {
-        const container = document.querySelector('#waveform');
-
         //  create element
-        this.wavesurfer =
-            this.wavesurfer ||
-            WaveSurfer.create({
+        const args = (container, timelineContainer) => {
+            return {
                 container,
-                height: 75,
+                height: this.props.data.file_info.nchannels === 2 ? 50 : 75,
                 hideScrollbar: false,
                 cursorColor: 'red',
                 cursorWidth: 2,
@@ -198,22 +199,51 @@ class AudioPlayer extends PureComponent {
                     }),
                     RegionPlugin.create({}),
                     TimelinePlugin.create({
-                        container: '#wave-timeline',
+                        container: timelineContainer,
                     }),
                 ],
                 xhr: { ...this.props.xhr },
-            });
-        document.wavesurfer = this.wavesurfer;
-
-        this.wavesurfer.empty();
+            };
+        };
+        this.wavesurfer.C0 =
+            this.wavesurfer.C0 || WaveSurfer.create(args('#waveformC0', '#wave-timelineC0'));
+        document.wavesurfer = this.wavesurfer.C0;
+        this.wavesurfer.C0.empty();
+        if (this.props.data.file_info.nchannels === 2) {
+            this.wavesurfer.C1 =
+                this.wavesurfer.C1 || WaveSurfer.create(args('#waveformC1', '#wave-timelineC1'));
+            // document.wavesurfer = this.wavesurfer.C0;
+            this.wavesurfer.C1.empty();
+            if (this.props.url) {
+                const urlExtension = `.${this.props.url.substring(
+                    this.props.url.lastIndexOf('.') + 1,
+                )}`;
+                this.wavesurfer.C1.load(
+                    `${this.props.url.split(urlExtension)[0]}_C1${urlExtension}`,
+                );
+                this.setRegions();
+            } else if (this.props.file) {
+                this.wavesurfer.C1.loadBlob(this.props.file);
+            }
+        }
         this.setDialogueMap();
 
         // load the file
         if (this.props.url) {
-            this.wavesurfer.load(this.props.url);
+            const urlExtension = `.${this.props.url.substring(
+                this.props.url.lastIndexOf('.') + 1,
+            )}`;
+
+            if (this.props.data.file_info.nchannels === 2) {
+                this.wavesurfer.C0.load(
+                    `${this.props.url.split(urlExtension)[0]}_C0${urlExtension}`,
+                );
+            } else {
+                this.wavesurfer.C0.load(this.props.url);
+            }
             this.setRegions();
         } else if (this.props.file) {
-            this.wavesurfer.loadBlob(this.props.file);
+            this.wavesurfer.C0.loadBlob(this.props.file);
         }
 
         // set the wavefile event
@@ -221,34 +251,40 @@ class AudioPlayer extends PureComponent {
     }
 
     handlePlay(playRegion) {
+        this.wavesurfer.C1 && this.wavesurfer.C1.pause();
+        this.wavesurfer.C0 && this.wavesurfer.C0.pause();
+
         if (!lodash.isNil(this.props.changeId)) {
             const region = playRegion || this.regions[this.state.playId];
             if (region) {
-                const currentTime = this.wavesurfer.getCurrentTime();
+                const currentTime = this.wavesurfer.C0.getCurrentTime();
                 if (currentTime > region.end) {
-                    this.wavesurfer.play(region.start, region.end);
+                    if (this.props.dialogue[this.props.playId].channel_id === 'C1') {
+                        this.wavesurfer.C1.play(region.start, region.end);
+                    } else {
+                        this.wavesurfer.C0.play(region.start, region.end);
+                    }
+                } else if (this.props.dialogue[this.props.playId].channel_id === 'C1') {
+                    this.wavesurfer.C1.play(currentTime, region.end);
                 } else {
-                    this.wavesurfer.play(currentTime, region.end);
+                    this.wavesurfer.C0.play(currentTime, region.end);
                 }
-            } else {
-                this.wavesurfer.play();
-            }
-        } else {
-            this.wavesurfer.play();
-        }
+            } else this.wavesurfer.C0.play();
+        } else this.wavesurfer.C0.play();
     }
 
     componentDidUpdate = (prevProps) => {
         // 更新
         if (prevProps.url !== this.props.url) {
-            this.wavesurfer.load(this.props.url);
+            this.wavesurfer.C0.load(this.props.url);
             this.setRegions();
         }
 
-        //  播放状态变化
+        // //  播放状态变化
         if (prevProps.pause !== this.props.pause && this.state.pause !== this.props.pause) {
             if (this.props.pause) {
-                this.wavesurfer.pause();
+                this.wavesurfer.C0 && this.wavesurfer.C0.pause();
+                this.wavesurfer.C1 && this.wavesurfer.C1.pause();
             } else {
                 this.handlePlay();
             }
@@ -257,14 +293,22 @@ class AudioPlayer extends PureComponent {
         // 段落变化
         if (this.props.dialogue !== prevProps.dialogue) {
             this.setDialogueMap();
+            console.log('段落变化');
 
-            if (this.props.dialogue && prevProps.dialogue && this.props.dialogue !== prevProps.dialogue) {
+            if (
+                this.props.dialogue &&
+                prevProps.dialogue &&
+                this.props.dialogue !== prevProps.dialogue
+            ) {
                 this.setRegions();
             }
         }
 
         // 播放位置变化
+
         if (this.props.changeId !== prevProps.changeId && this.props.changeId) {
+            console.log('播放位置变化1');
+
             this.handlePlay();
         }
 
@@ -278,7 +322,13 @@ class AudioPlayer extends PureComponent {
                     const region = this.regions[this.state.playId];
 
                     if (!this.props.pause && region) {
-                        this.wavesurfer.play(region.start, region.end);
+                        if (this.props.dialogue[this.props.playId].channel_id === 'C1') {
+                            this.wavesurfer.C1 && this.wavesurfer.C1.play(region.start, region.end);
+                            this.wavesurfer.C0 && this.wavesurfer.C0.pause();
+                        } else {
+                            this.wavesurfer.C0 && this.wavesurfer.C0.play(region.start, region.end);
+                            this.wavesurfer.C1 && this.wavesurfer.C1.pause();
+                        }
                         // region.play()
                     }
                 },
@@ -287,7 +337,7 @@ class AudioPlayer extends PureComponent {
     };
 
     setDialogueMap() {
-        if(this.props.dialogue){
+        if (this.props.dialogue) {
             this.props.dialogue.forEach((item) => {
                 this.dialogueMap[item.id] = item;
             });
@@ -295,35 +345,32 @@ class AudioPlayer extends PureComponent {
     }
 
     setEvents = () => {
-        this.wavesurfer.on('pause', () => {
+        this.wavesurfer.C0.on('pause', () => {
             this.setState({ pause: true }, () => {
-                if(this.props.pause !== this.state.pause &&
-                    this.props.onPauseChange){
+                if (this.props.pause !== this.state.pause && this.props.onPauseChange) {
                     this.props.onPauseChange(true);
                 }
-
             });
         });
 
-        // this.wavesurfer.on("interaction", () => {
+        // this.wavesurfer.C0.on("interaction", () => {
         //     console.log("interaction")
         //     this.handlePlay()
         // })
 
-        this.wavesurfer.on('play', () => {
+        this.wavesurfer.C0.on('play', () => {
             this.setState({ pause: false }, () => {
-                if(this.props.pause !== this.state.pause && this.props.onPauseChange){
+                if (this.props.pause !== this.state.pause && this.props.onPauseChange) {
                     this.props.onPauseChange(false);
                 }
             });
         });
 
-        this.wavesurfer.on('region-in', (region) => {
+        this.wavesurfer.C0.on('region-in', (region) => {
             this.setState(
                 { playId: region.id },
                 () => {
-                    if(this.props.playId !== this.state.playId &&
-                        this.props.onPlayChange){
+                    if (this.props.playId !== this.state.playId && this.props.onPlayChange) {
                         this.props.onPlayChange(region.id);
                     }
                 },
@@ -332,30 +379,29 @@ class AudioPlayer extends PureComponent {
                 },
             );
         });
-        this.wavesurfer.on('region-out', () => {
-        });
-        this.wavesurfer.on('region-play', () => {
+        this.wavesurfer.C0.on('region-out', () => {});
+        this.wavesurfer.C0.on('region-play', () => {
             this.setState({ pause: false }, () => {
-                if(this.props.onPauseChange){
+                if (this.props.onPauseChange) {
                     this.props.onPauseChange(false);
                 }
             });
         });
 
-        this.wavesurfer.on('region-click', () => {
+        this.wavesurfer.C0.on('region-click', () => {
             setTimeout(() => {
                 // this.handlePlay(region)
             }, 100);
         });
 
-        this.wavesurfer.on('ready', (region, e) => {
-            if(this.props.onReady){
+        this.wavesurfer.C0.on('ready', (region, e) => {
+            if (this.props.onReady) {
                 this.props.onReady(e);
             }
         });
 
-        this.wavesurfer.on('region-update-end', (region) => {
-            if(this.props.onRegionUpdate){
+        this.wavesurfer.C0.on('region-update-end', (region) => {
+            if (this.props.onRegionUpdate) {
                 this.props.onRegionUpdate(
                     region.id,
                     region.start > 0 ? Math.round(region.start * 1000) : 0,
@@ -363,6 +409,73 @@ class AudioPlayer extends PureComponent {
                 );
             }
         });
+
+        if (this.props.data.file_info.nchannels === 2) {
+            this.wavesurfer.C1.on('pause', () => {
+                this.setState({ pause: true }, () => {
+                    if (this.props.pause !== this.state.pause && this.props.onPauseChange) {
+                        this.props.onPauseChange(true);
+                    }
+                });
+            });
+
+            // this.wavesurfer.C0.on("interaction", () => {
+            //     console.log("interaction")
+            //     this.handlePlay()
+            // })
+
+            this.wavesurfer.C1.on('play', () => {
+                this.setState({ pause: false }, () => {
+                    if (this.props.pause !== this.state.pause && this.props.onPauseChange) {
+                        this.props.onPauseChange(false);
+                    }
+                });
+            });
+
+            this.wavesurfer.C1.on('region-in', (region) => {
+                this.setState(
+                    { playId: region.id },
+                    () => {
+                        if (this.props.playId !== this.state.playId && this.props.onPlayChange) {
+                            this.props.onPlayChange(region.id);
+                        }
+                    },
+                    () => {
+                        this.handlePlay(region);
+                    },
+                );
+            });
+            this.wavesurfer.C1.on('region-out', () => {});
+            this.wavesurfer.C1.on('region-play', () => {
+                this.setState({ pause: false }, () => {
+                    if (this.props.onPauseChange) {
+                        this.props.onPauseChange(false);
+                    }
+                });
+            });
+
+            this.wavesurfer.C1.on('region-click', () => {
+                setTimeout(() => {
+                    // this.handlePlay(region)
+                }, 100);
+            });
+
+            this.wavesurfer.C1.on('ready', (region, e) => {
+                if (this.props.onReady) {
+                    this.props.onReady(e);
+                }
+            });
+
+            this.wavesurfer.C1.on('region-update-end', (region) => {
+                if (this.props.onRegionUpdate) {
+                    this.props.onRegionUpdate(
+                        region.id,
+                        region.start > 0 ? Math.round(region.start * 1000) : 0,
+                        region.end > 0 ? Math.round(region.end * 1000) : 0,
+                    );
+                }
+            });
+        }
     };
 
     /**
@@ -370,15 +483,28 @@ class AudioPlayer extends PureComponent {
      */
     setRegions = () => {
         const { dialogue } = this.props;
-        let lastItem = null;
-        this.wavesurfer.clearRegions();
-
-        if(dialogue){
-            dialogue.forEach((item) => {
-                let start =
-                    lastItem && item.beginTime < lastItem.endTime ? lastItem.endTime : item.beginTime;
-                if (lastItem && start <= lastItem.endTime + 100) {
-                    start += 100;
+        const lastItem = {};
+        this.wavesurfer.C0 && this.wavesurfer.C0.clearRegions();
+        this.wavesurfer.C1 && this.wavesurfer.C1.clearRegions();
+        if (dialogue) {
+            dialogue.forEach((item, index) => {
+                let start;
+                if (item.channel_id === 'C1') {
+                    start =
+                        lastItem.C1 && item.beginTime < lastItem.C1.endTime
+                            ? lastItem.C1.endTime
+                            : item.beginTime;
+                    if (lastItem.C1 && start <= lastItem.C1.endTime + 100) {
+                        start += 100;
+                    }
+                } else {
+                    start =
+                        lastItem.C0 && item.beginTime < lastItem.C0.endTime
+                            ? lastItem.C0.endTime
+                            : item.beginTime;
+                    if (lastItem.C0 && start <= lastItem.C0.endTime + 100) {
+                        start += 100;
+                    }
                 }
 
                 const options = {
@@ -390,8 +516,14 @@ class AudioPlayer extends PureComponent {
                     end: item.endTime / 1000,
                     color: 'rgb(63, 63, 68,0.4)',
                 };
-                this.regions[item.id] = this.wavesurfer.addRegion(options);
-                lastItem = item;
+                if (item.channel_id === 'C1') {
+                    this.regions[item.id] = this.wavesurfer.C1.addRegion(options);
+                    lastItem.C1 = item;
+                } else {
+                    this.regions[item.id] = this.wavesurfer.C0.addRegion(options);
+                    lastItem.C0 = item;
+                }
+                // lastItem = item;
             });
         }
     };
@@ -400,8 +532,11 @@ class AudioPlayer extends PureComponent {
         const { pause } = this.state;
         return (
             <Fragment>
-                <div id="wave-timeline" />
-                <div id="waveform" />
+                <div id="wave-timelineC0" />
+                <div id="waveformC0" />
+                <div id="waveformC1" />
+                <div id="wave-timelineC1" />
+
                 <Row gutter={8} type="flex" justify="space-between" style={{ marginTop: 8 }}>
                     <Col>
                         <ButtonGroup>
@@ -422,7 +557,8 @@ class AudioPlayer extends PureComponent {
                                         this.setState({
                                             pause: true,
                                         });
-                                        this.wavesurfer.pause();
+                                        this.wavesurfer.C0 && this.wavesurfer.C0.pause();
+                                        this.wavesurfer.C1 && this.wavesurfer.C1.pause();
                                     }}
                                 >
                                     暂停
@@ -440,33 +576,33 @@ class AudioPlayer extends PureComponent {
                             <Button
                                 style={{ marginLeft: '8px' }}
                                 onClick={() => {
-                                    const rate = this.wavesurfer.getPlaybackRate();
+                                    const rate = this.wavesurfer.C0.getPlaybackRate();
                                     if (rate >= 2) {
                                         return;
                                     }
-                                    this.wavesurfer.setPlaybackRate(0.8);
+                                    this.wavesurfer.C0.setPlaybackRate(0.8);
                                 }}
                             >
                                 0.8倍速
                             </Button>
                             <Button
                                 onClick={() => {
-                                    const rate = this.wavesurfer.getPlaybackRate();
+                                    const rate = this.wavesurfer.C0.getPlaybackRate();
                                     if (rate >= 2) {
                                         return;
                                     }
-                                    this.wavesurfer.setPlaybackRate(1);
+                                    this.wavesurfer.C0.setPlaybackRate(1);
                                 }}
                             >
                                 1倍速
                             </Button>
                             <Button
                                 onClick={() => {
-                                    const rate = this.wavesurfer.getPlaybackRate();
+                                    const rate = this.wavesurfer.C0.getPlaybackRate();
                                     if (rate >= 2) {
                                         return;
                                     }
-                                    this.wavesurfer.setPlaybackRate(1.2);
+                                    this.wavesurfer.C0.setPlaybackRate(1.2);
                                 }}
                             >
                                 1.2倍速

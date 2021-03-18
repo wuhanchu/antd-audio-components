@@ -1,11 +1,7 @@
-import AudioPlayer from './AudioPlayer';
-import TalkTimeLine, { RECORD_TYPE } from './TalkTimeLine';
-import Iconfont from '../Utils/IconFont';
 import { antdUtils, frSchema } from '@/outter';
 import { schemaFieldType } from '@/outter/fr-schema/src/schema';
 // import service, { markFormRemote } from '@/schemas/user/item/service';
 // import { getMarkSchema } from '@/schemas/user/item/schema';
-import { numToChinese } from '../Utils/nzh';
 import { CaretDownOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import keyboardJS from 'keyboardjs';
@@ -31,6 +27,10 @@ import styled from 'styled-components';
 // import itemService from '@/schemas/project/item/service';
 import ButtonSpace from '@/components/Extra/Button/ButtonSpace';
 import { createComponent } from '@/outter/fr-schema-antd-utils/src/utils/component';
+import { numToChinese } from '../Utils/nzh';
+import Iconfont from '../Utils/IconFont';
+import TalkTimeLine, { RECORD_TYPE } from './TalkTimeLine';
+import AudioPlayer from './AudioPlayer';
 
 const { actions } = frSchema;
 const { InfoModal } = antdUtils.components;
@@ -56,9 +56,11 @@ export const MARK_ACTIONS = {
 })
 export default class MarkItem extends PureComponent {
     keyBindMethods = []; // 绑定方法
+
     type = null; // 查询的数据类型
-    schema= {}
-    
+
+    schema = {};
+
     state = {
         data: null, // item data
         audioUrl: null, // 音频 url
@@ -71,65 +73,68 @@ export default class MarkItem extends PureComponent {
         project: {
             role: [
                 {
-                    "value" : "customer_servicer",
-                    "color" : "darkviolet",
-                    "remark" : "坐席"
-                  },
-                  {
-                    "value" : "customer",
-                    "color" : "aquamarine",
-                    "remark" : "客户"
-                  }
+                    value: 'customer_servicer',
+                    color: 'darkviolet',
+                    remark: '坐席',
+                },
+                {
+                    value: 'customer',
+                    color: 'aquamarine',
+                    remark: '客户',
+                },
             ],
             label: [
                 {
-                  "value" : "man",
-                  "color" : "blue",
-                  "remark" : "男"
+                    value: 'man',
+                    color: 'blue',
+                    remark: '男',
                 },
                 {
-                  "value" : "woman",
-                  "color" : "pink",
-                  "remark" : "女"
+                    value: 'woman',
+                    color: 'pink',
+                    remark: '女',
                 },
                 {
-                  "value" : "accent",
-                  "color" : "green",
-                  "remark" : "口音"
+                    value: 'accent',
+                    color: 'green',
+                    remark: '口音',
                 },
                 {
-                  "value" : "dialect",
-                  "color" : "black",
-                  "remark" : "方言"
+                    value: 'dialect',
+                    color: 'black',
+                    remark: '方言',
                 },
                 {
-                  "value" : "noise",
-                  "color" : "red",
-                  "remark" : "噪音"
+                    value: 'noise',
+                    color: 'red',
+                    remark: '噪音',
                 },
                 {
-                  "value" : "loud",
-                  "color" : "DarkSlateGray",
-                  "remark" : "音量太大"
+                    value: 'loud',
+                    color: 'DarkSlateGray',
+                    remark: '音量太大',
                 },
-              
-                  {
-                  "value" : "inaudible",
-                  "color" : "PaleTurquoise",
-                  "remark" : "音量太小"
-                },{
-                  "value" : "angry",
-                  "color" : "OrangeRed",
-                  "remark" : "愤怒"
-                },{
-                  "value" : "multi_user",
-                  "color" : "HotPink",
-                  "remark" : "多人"
-                }
-              ]
+
+                {
+                    value: 'inaudible',
+                    color: 'PaleTurquoise',
+                    remark: '音量太小',
+                },
+                {
+                    value: 'angry',
+                    color: 'OrangeRed',
+                    remark: '愤怒',
+                },
+                {
+                    value: 'multi_user',
+                    color: 'HotPink',
+                    remark: '多人',
+                },
+            ],
         },
         txtType: null, // 显示的文本类型
     };
+
     dialogueHist = [];
 
     constructor(props) {
@@ -170,20 +175,22 @@ export default class MarkItem extends PureComponent {
     refreshData = async () => {
         const { filter } = this.state;
         const { record, notShow } = this.props;
-        let data = record
-        data.content = record.content && record.content.map((item, index)=>{
-            return {...item, id: item.id|| index }
-        }),
-        this.setState(
-            {
-                data: data,
-                // project,
-                loading: false,
-            },
-            () => {
-                this.setTxtType();
-            },
-        );
+        const data = record;
+        (data.content =
+            record.content &&
+            record.content.map((item, index) => {
+                return { ...item, id: item.id || index };
+            })),
+            this.setState(
+                {
+                    data,
+                    // project,
+                    loading: false,
+                },
+                () => {
+                    this.setTxtType();
+                },
+            );
     };
 
     /**
@@ -268,12 +275,12 @@ export default class MarkItem extends PureComponent {
         switch (type || this.props.action) {
             case MARK_ACTIONS.mark:
                 this.type = 1; // 查询类型
-                this.initTextObj = data && data['text'] ? 'text' : 'asr_txt';
+                this.initTextObj = data && data.text ? 'text' : 'asr_txt';
                 this.handleTextObj = 'text';
                 break;
             case MARK_ACTIONS.inspection:
                 this.type = 2; // 查询类型
-                this.initTextObj = data && data['inspection_txt'] ? 'inspection_txt' : 'text';
+                this.initTextObj = data && data.inspection_txt ? 'inspection_txt' : 'text';
                 this.handleTextObj = 'inspection_txt';
                 break;
             default:
@@ -296,11 +303,11 @@ export default class MarkItem extends PureComponent {
         if (dialogue) {
             dialogue = JSON.parse(dialogue);
             dialogue = dialogue.map((item) => {
-                let text = item.text;
+                let { text } = item;
                 if (text) {
                     text = text.replace(/、/g, '，');
                     text = text.replace(/\n/g, '');
-                    let str = text
+                    const str = text
                         .replace(/\n/g, ' ')
                         .replace(/。/g, ' ')
                         .replace(/，/g, ' ')
@@ -318,7 +325,7 @@ export default class MarkItem extends PureComponent {
                 return {
                     ...item,
 
-                    text: text,
+                    text,
                 };
             });
         } else {
@@ -335,8 +342,8 @@ export default class MarkItem extends PureComponent {
                         endTime =
                             item.end_time < this.state.data.file_info.original_length
                                 ? item.end_time
-                                ? item.end_time - 1
-                                : 1
+                                    ? item.end_time - 1
+                                    : 1
                                 : this.state.data.file_info.original_length - 1;
                     } else {
                         endTime = item.end_time ? item.end_time : 100;
@@ -345,7 +352,7 @@ export default class MarkItem extends PureComponent {
                         ...item,
                         type: RECORD_TYPE.record,
                         beginTime: item.begin_time > 0 ? item.begin_time : 0,
-                        endTime: endTime,
+                        endTime,
                         text: item.text,
                     };
                 });
@@ -359,7 +366,7 @@ export default class MarkItem extends PureComponent {
      * 转换对话为文本
      */
     getSubmitObj(dialogue) {
-        let lableSex = {};
+        const lableSex = {};
         for (const item in dialogue) {
             if (
                 dialogue[item].text &&
@@ -392,16 +399,14 @@ export default class MarkItem extends PureComponent {
                 } else {
                     label.woman = lableSex.woman;
                 }
-            } else {
-                if (item.text && !item.labels && (lableSex.man || lableSex.woman)) {
-                    if (!item.labels) {
-                        label = {};
-                    }
-                    if (lableSex.man) {
-                        label.man = lableSex.man;
-                    } else {
-                        label.woman = lableSex.woman;
-                    }
+            } else if (item.text && !item.labels && (lableSex.man || lableSex.woman)) {
+                if (!item.labels) {
+                    label = {};
+                }
+                if (lableSex.man) {
+                    label.man = lableSex.man;
+                } else {
+                    label.woman = lableSex.woman;
                 }
             }
 
@@ -412,13 +417,13 @@ export default class MarkItem extends PureComponent {
                 labels: label,
                 role: item.role,
             });
-            let text = item.text;
+            let { text } = item;
 
             if (text) {
                 text = text.replace(/、/g, '，');
                 text = text.replace(/\n/g, '');
 
-                let str = text
+                const str = text
                     .replace(/\n/g, ' ')
                     .replace(/。/g, ' ')
                     .replace(/，/g, ' ')
@@ -434,7 +439,7 @@ export default class MarkItem extends PureComponent {
             return {
                 begin_time: item.beginTime,
                 end_time: item.endTime,
-                text: text,
+                text,
                 labels: label,
                 role: item.role,
             };
@@ -455,12 +460,12 @@ export default class MarkItem extends PureComponent {
                     const handleText = this.getSubmitObj(dialogue);
 
                     //  提交数据
-                    let submitParam = {
+                    const submitParam = {
                         id: data.id,
                         label: data.label,
                         status: this.type === 1 ? 'marked' : 'inspected',
                     };
-                    submitParam['content'] = handleText;
+                    submitParam.content = handleText;
                     await service.submit(submitParam);
                     this.setState({
                         dialogue: [],
@@ -482,8 +487,8 @@ export default class MarkItem extends PureComponent {
         if (visable) {
             keyboardJS.unbind('ctrl + z');
         } else {
-            let key = 'ctrl + z';
-            let method = (e) => {
+            const key = 'ctrl + z';
+            const method = (e) => {
                 e.preventDefault();
                 this.handleUndo();
             };
@@ -508,7 +513,7 @@ export default class MarkItem extends PureComponent {
                 const handleText = this.getSubmitObj(dialogue);
 
                 //  提交数据
-                let submitParam = {
+                const submitParam = {
                     id: data.id,
                     status: 'skip',
                 };
@@ -531,7 +536,7 @@ export default class MarkItem extends PureComponent {
      */
     setDialogueChinese(callback) {
         const dialogue = this.state.dialogue.map((item) => {
-            let text = item.text && numToChinese(item.text);
+            const text = item.text && numToChinese(item.text);
             return { ...item, text };
         });
         this.setState({ dialogue }, callback);
@@ -546,14 +551,14 @@ export default class MarkItem extends PureComponent {
 
         if (
             this.state.dialogue.some((checkItem, checkIndex) => {
-                let max = [item.beginTime, checkItem.beginTime];
-                let min = [item.endTime, checkItem.endTime];
+                const max = [item.beginTime, checkItem.beginTime];
+                const min = [item.endTime, checkItem.endTime];
                 if (checkIndex !== index && Math.max.apply(null, max) < Math.min.apply(null, min)) {
                     return true;
                 }
             })
         ) {
-            let dialogue = this.state.dialogue.setIn([index], clone(this.state.dialogue[index]));
+            const dialogue = this.state.dialogue.setIn([index], clone(this.state.dialogue[index]));
 
             this.setState({
                 dialogue,
@@ -561,7 +566,7 @@ export default class MarkItem extends PureComponent {
             return;
         }
 
-        let dialogue = this.state.dialogue.setIn([index], item);
+        const dialogue = this.state.dialogue.setIn([index], item);
 
         this.handlePushHist(dialogue);
         this.setState({
@@ -619,10 +624,10 @@ export default class MarkItem extends PureComponent {
 
         const data = this.dialogueHist[histIndex];
         data &&
-        this.setState({
-            dialogue: Immutable(data),
-            histIndex: histIndex,
-        });
+            this.setState({
+                dialogue: Immutable(data),
+                histIndex,
+            });
     };
 
     handleRedo = () => {
@@ -630,17 +635,17 @@ export default class MarkItem extends PureComponent {
 
         const data = this.dialogueHist[histIndex];
         data &&
-        this.setState({
-            dialogue: Immutable(data),
-            histIndex: histIndex,
-        });
+            this.setState({
+                dialogue: Immutable(data),
+                histIndex,
+            });
     };
 
     /**
      * 获取localstorage存储key
      */
     getStorageKey() {
-        return 'dialogue_' + this.props.action + '_' + this.state.data.id;
+        return `dialogue_${this.props.action}_${this.state.data.id}`;
     }
 
     /**
@@ -654,7 +659,7 @@ export default class MarkItem extends PureComponent {
         if (!this.schema || !this.schema.label.dict) {
             return null;
         }
-        let props = {};
+        const props = {};
         if (this.state.data) {
             props.label = null;
         }
@@ -668,7 +673,7 @@ export default class MarkItem extends PureComponent {
             props: {
                 disabled: this.props.action === MARK_ACTIONS.view,
                 size: 'middle',
-                value: value,
+                value,
                 placeholder: '选择相关标签',
                 mode: 'tags',
                 onChange: (label) => this.setState({ data: { ...this.state.data, label } }),
@@ -690,14 +695,14 @@ export default class MarkItem extends PureComponent {
         let labels = null;
 
         try {
-            if(typeof(project.role)!=='object'){
+            if (typeof project.role !== 'object') {
                 project.role && (role = JSON.parse(project.role));
-            }else{
+            } else {
                 project.role && (role = project.role);
             }
-            if(typeof(project.label)!=='object'){
+            if (typeof project.label !== 'object') {
                 project.label && (labels = JSON.parse(project.label));
-            }else{
+            } else {
                 project.label && (labels = project.label);
             }
             this.schema.label = {
@@ -710,7 +715,7 @@ export default class MarkItem extends PureComponent {
                 // required: true,
             };
         } catch (e) {
-            console.error('renderTimeLine JSON.parse error:' + e.message);
+            console.error(`renderTimeLine JSON.parse error:${e.message}`);
         }
         console.log('热词');
         return (
@@ -727,7 +732,7 @@ export default class MarkItem extends PureComponent {
                     }}
                     pause={pause}
                     action={this.props.action}
-                    showUserSelect={true}
+                    showUserSelect
                     playId={playId}
                     changeId={changeId}
                     showTips={this.props.action !== MARK_ACTIONS.view}
@@ -738,7 +743,9 @@ export default class MarkItem extends PureComponent {
                         this.setState({ pause });
                     }}
                     hotWordList={
-                        this.state.project && this.state.project.hot_word ? this.state.project.hot_word.split('|') : []
+                        this.state.project && this.state.project.hot_word
+                            ? this.state.project.hot_word.split('|')
+                            : []
                     }
                     onPlayChange={this.handlePlayChange}
                     onDialogueChange={
@@ -772,10 +779,10 @@ export default class MarkItem extends PureComponent {
      * render audio player
      */
     renderAudioPlayer() {
-        let { data, audioUrl, dialogue, pause, playId, changeId } = this.state;
+        const { data, audioUrl, dialogue, pause, playId, changeId } = this.state;
         const options = frSchema.utils.getXhrOptions();
 
-        let dialogues = clone(dialogue);
+        const dialogues = clone(dialogue);
         console.log('this.state.dialogue ', dialogue);
 
         return (
@@ -810,9 +817,9 @@ export default class MarkItem extends PureComponent {
                         this.state.hisLength >= 1 && (
                             <Fragment>
                                 {!lodash.isNil(this.state.histIndex) &&
-                                this.state.histIndex < this.state.hisLength - 1 && (
-                                    <ButtonSpace onClick={this.handleRedo}>反撤销</ButtonSpace>
-                                )}
+                                    this.state.histIndex < this.state.hisLength - 1 && (
+                                        <ButtonSpace onClick={this.handleRedo}>反撤销</ButtonSpace>
+                                    )}
                                 {(lodash.isNil(this.state.histIndex) ||
                                     this.state.histIndex > 0) && (
                                     <Button
@@ -901,7 +908,7 @@ export default class MarkItem extends PureComponent {
         const { data } = this.state;
 
         this.txtTypeDict = {};
-        let txtType = null;
+        const txtType = null;
 
         if (record && this.props.action === MARK_ACTIONS.view) {
             // let List = await itemService.getLog(this.state.data);
@@ -990,7 +997,7 @@ export default class MarkItem extends PureComponent {
         return (
             this.state.showErrorModal && (
                 <InfoModal
-                    title={'如果当前数据异常，请填写备注，跳过当前数据！'}
+                    title="如果当前数据异常，请填写备注，跳过当前数据！"
                     action={actions.edit}
                     handleUpdate={async (values) => {
                         await itemService.patch({
@@ -1006,7 +1013,7 @@ export default class MarkItem extends PureComponent {
                         this.setState({ showErrorModal: false });
                     }}
                     values={data}
-                    visible={true}
+                    visible
                     onCancel={() => this.setState({ showErrorModal: false })}
                     schema={{
                         id,
@@ -1029,13 +1036,12 @@ export default class MarkItem extends PureComponent {
                     bottom: 32,
                 }}
                 title={
-                    <Row justify={'space-between'} type="flex">
+                    <Row justify="space-between" type="flex">
                         <Col>
                             {this.state.loading
                                 ? '文件信息'
-                                :
-                                (data && data.file_path ?  data.file_path : '') +
-                                (data && data.last_name ? ' - ' + data.last_name : '')}
+                                : (data && data.file_path ? data.file_path : '') +
+                                  (data && data.last_name ? ` - ${data.last_name}` : '')}
                         </Col>
 
                         <Col>
@@ -1068,7 +1074,7 @@ export default class MarkItem extends PureComponent {
                                                                         '，',
                                                                     ),
                                                             }}
-                                                            />
+                                                        />
                                                     </div>
                                                 </Fragment>
                                             }
@@ -1127,10 +1133,10 @@ export default class MarkItem extends PureComponent {
                                                     {'SHIFT + Alt + <-'}
                                                 </Descriptions.Item>
                                                 <Descriptions.Item label="加速">
-                                                    {'SHIFT + Alt + ⬆'}
+                                                    SHIFT + Alt + ⬆
                                                 </Descriptions.Item>
                                                 <Descriptions.Item label="减速">
-                                                    {'SHIFT + Alt + ⬇'}
+                                                    SHIFT + Alt + ⬇
                                                 </Descriptions.Item>
                                                 <Descriptions.Item label="播放下一段">
                                                     Tab
@@ -1161,9 +1167,9 @@ export default class MarkItem extends PureComponent {
                         </Col>
                     </Row>
                 }
-                visible={true}
+                visible
                 width="90%"
-                mask={true}
+                mask
                 closable={false}
                 maskClosable={action === MARK_ACTIONS.view}
                 onCancel={this.props.onCancel}
@@ -1197,7 +1203,7 @@ export default class MarkItem extends PureComponent {
                 <Spin tip="加载中..." spinning={!this.schema || this.state.loading}>
                     {this.schema && !this.state.loading && (
                         <Fragment>
-                            {/*{this.renderInfoBar()}*/}
+                            {/* {this.renderInfoBar()} */}
                             <Row>
                                 <Col span={24} style={{ height: '130px' }}>
                                     {this.renderAudioPlayer()}
