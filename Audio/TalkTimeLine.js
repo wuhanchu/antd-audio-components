@@ -492,7 +492,10 @@ class TalkTimeLine extends PureComponent {
                 if (items.channel_id === item.channel_id) {
                     return { ...items, role: value };
                 }
-                return { ...items };
+                if (value === 'customer_servicer') {
+                    return { ...items, role: 'customer' };
+                }
+                return { ...items, role: 'customer_servicer' };
             });
             this.props.handleChangeDialogue(Immutable(dialogueArr));
         }
@@ -831,7 +834,10 @@ class TalkTimeLine extends PureComponent {
                                         let tempDialogue = clone(dialogue);
                                         let indexLast = 0;
                                         const temp = tempDialogue.filter((itemTempDialogue) => {
-                                            return itemTempDialogue.channel_id === dialogue[index].channel_id;
+                                            return (
+                                                itemTempDialogue.channel_id ===
+                                                dialogue[index].channel_id
+                                            );
                                         });
                                         temp.map((itemTemp, indexTemp) => {
                                             if (dialogue[index].id === itemTemp.id) {
