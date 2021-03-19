@@ -257,17 +257,19 @@ class AudioPlayer extends PureComponent {
         if (!lodash.isNil(this.props.changeId)) {
             const region = playRegion || this.regions[this.state.playId];
             if (region) {
-                const currentTime = this.wavesurfer.C0.getCurrentTime();
-                if (currentTime > region.end) {
+                const currentTimeC0 = this.wavesurfer.C0.getCurrentTime();
+                const currentTimeC1 = this.wavesurfer.C1 && this.wavesurfer.C1.getCurrentTime();
+
+                if (currentTimeC0 > region.end || currentTimeC1 > region.end) {
                     if (this.props.dialogue[this.props.playId].channel_id === 'C1') {
                         this.wavesurfer.C1.play(region.start, region.end);
                     } else {
                         this.wavesurfer.C0.play(region.start, region.end);
                     }
                 } else if (this.props.dialogue[this.props.playId].channel_id === 'C1') {
-                    this.wavesurfer.C1.play(currentTime, region.end);
+                    this.wavesurfer.C1.play(currentTimeC1, region.end);
                 } else {
-                    this.wavesurfer.C0.play(currentTime, region.end);
+                    this.wavesurfer.C0.play(currentTimeC0, region.end);
                 }
             } else this.wavesurfer.C0.play();
         } else this.wavesurfer.C0.play();

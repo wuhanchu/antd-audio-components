@@ -829,18 +829,17 @@ class TalkTimeLine extends PureComponent {
                                     onClick={() => {
                                         const { dialogue } = this.props;
                                         let tempDialogue = clone(dialogue);
-                                        let indexiii = 0
-                                        let temp = tempDialogue.filter((item) => {
-                                            return (
-                                                item.channel_id === dialogue[index].channel_id
-                                            );
-                                        })
-                                        temp.map((item,indexsss)=>{
-                                            if (dialogue[index].id === item.id){
-                                                indexiii = indexsss
+                                        let indexLast = 0;
+                                        const temp = tempDialogue.filter((itemTempDialogue) => {
+                                            return itemTempDialogue.channel_id === dialogue[index].channel_id;
+                                        });
+                                        temp.map((itemTemp, indexTemp) => {
+                                            if (dialogue[index].id === itemTemp.id) {
+                                                indexLast = indexTemp;
                                             }
-                                        })
-                                        const lastItem = temp[indexiii - 1];
+                                            return itemTemp;
+                                        });
+                                        const lastItem = temp[indexLast - 1];
                                         lastItem.endTime = item.endTime;
 
                                         lastItem.beginTime =
