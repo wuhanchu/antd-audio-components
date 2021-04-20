@@ -271,8 +271,20 @@ class AudioPlayer extends PureComponent {
                 } else {
                     this.wavesurfer.C0.play(currentTimeC0, region.end);
                 }
-            } else this.wavesurfer.C0.play();
-        } else this.wavesurfer.C0.play();
+            } else {
+                if (this.props.playId && this.props.dialogue[this.props.playId].channel_id === 'C1') {
+                    this.wavesurfer.C1.play();
+                } else {
+                    this.wavesurfer.C0.play();
+                }
+            }
+        } else {
+            if (this.props.playId && this.props.dialogue[this.props.playId].channel_id === 'C1') {
+                this.wavesurfer.C1.play();
+            } else {
+                this.wavesurfer.C0.play();
+            }
+        }
     }
 
     componentDidUpdate = (prevProps) => {
