@@ -250,10 +250,21 @@ class AudioPlayer extends PureComponent {
         this.setEvents();
     }
 
-    handlePlay(playRegion) {
+    handlePlay(playRegion, isOnClick) {
         this.wavesurfer.C1 && this.wavesurfer.C1.pause();
         this.wavesurfer.C0 && this.wavesurfer.C0.pause();
-
+        if(isOnClick && this.props.data.file_info.nchannels === 2){
+            if(this.wavesurfer.C1.getCurrentTime() > this.wavesurfer.C0.getCurrentTime()){
+                this.wavesurfer.C1 && this.wavesurfer.C1.play();
+                this.wavesurfer.C0 && this.wavesurfer.C0.play(this.wavesurfer.C1.getCurrentTime());
+            }
+            else{
+                this.wavesurfer.C1 && this.wavesurfer.C1.play(this.wavesurfer.C0.getCurrentTime());
+                this.wavesurfer.C0 && this.wavesurfer.C0.play();
+            }
+            
+            return
+        }
         if (!lodash.isNil(this.props.changeId)) {
             const region = playRegion || this.regions[this.state.playId];
             if (region) {
@@ -262,6 +273,7 @@ class AudioPlayer extends PureComponent {
 
                 if (currentTimeC0 > region.end || currentTimeC1 > region.end) {
                     if (this.props.dialogue[this.props.playId].channel_id === 'C1') {
+
                         this.wavesurfer.C1.play(region.start, region.end);
                     } else {
                         this.wavesurfer.C0.play(region.start, region.end);
@@ -270,6 +282,7 @@ class AudioPlayer extends PureComponent {
                     this.wavesurfer.C1.play(currentTimeC1, region.end);
                 } else {
                     this.wavesurfer.C0.play(currentTimeC0, region.end);
+
                 }
             } else {
                 if (this.props.playId && this.props.dialogue[this.props.playId].channel_id === 'C1') {
@@ -281,6 +294,7 @@ class AudioPlayer extends PureComponent {
         } else {
             if (this.props.playId && this.props.dialogue[this.props.playId].channel_id === 'C1') {
                 this.wavesurfer.C1.play();
+                
             } else {
                 this.wavesurfer.C0.play();
             }
@@ -393,7 +407,7 @@ class AudioPlayer extends PureComponent {
                 },
             );
         });
-        this.wavesurfer.C0.on('region-out', () => {});
+        this.wavesurfer.C0.on('region-out', () => { });
         this.wavesurfer.C0.on('region-play', () => {
             this.setState({ pause: false }, () => {
                 if (this.props.onPauseChange) {
@@ -459,7 +473,7 @@ class AudioPlayer extends PureComponent {
                     },
                 );
             });
-            this.wavesurfer.C1.on('region-out', () => {});
+            this.wavesurfer.C1.on('region-out', () => { });
             this.wavesurfer.C1.on('region-play', () => {
                 this.setState({ pause: false }, () => {
                     if (this.props.onPauseChange) {
@@ -560,7 +574,7 @@ class AudioPlayer extends PureComponent {
                                         this.setState({
                                             pause: false,
                                         });
-                                        this.handlePlay();
+                                        this.handlePlay(null,true);
                                     }}
                                 >
                                     播放
