@@ -174,10 +174,12 @@ class AudioPlayer extends PureComponent {
 
     componentDidMount() {
         //  create element
+        console.log("内容")
+        console.log(this.props)
         const args = (container, timelineContainer) => {
             return {
                 container,
-                height: this.props.data.file_info.nchannels === 2 ? 50 : 75,
+                height: this.props.enable_speech_audio ? 50 : 75,
                 hideScrollbar: false,
                 cursorColor: 'red',
                 cursorWidth: 2,
@@ -209,7 +211,7 @@ class AudioPlayer extends PureComponent {
             this.wavesurfer.C0 || WaveSurfer.create(args('#waveformC0', '#wave-timelineC0'));
         document.wavesurfer = this.wavesurfer.C0;
         this.wavesurfer.C0.empty();
-        if (this.props.data.file_info.nchannels === 2) {
+        if (this.props.enable_speech_audio) {
             this.wavesurfer.C1 =
                 this.wavesurfer.C1 || WaveSurfer.create(args('#waveformC1', '#wave-timelineC1'));
             // document.wavesurfer = this.wavesurfer.C0;
@@ -234,7 +236,7 @@ class AudioPlayer extends PureComponent {
                 this.props.url.lastIndexOf('.') + 1,
             )}`;
 
-            if (this.props.data.file_info.nchannels === 2) {
+            if (this.props.enable_speech_audio) {
                 this.wavesurfer.C0.load(
                     `${this.props.url.split(urlExtension)[0]}_C0${urlExtension}`,
                 );
@@ -253,7 +255,7 @@ class AudioPlayer extends PureComponent {
     handlePlay(playRegion, isOnClick) {
         this.wavesurfer.C1 && this.wavesurfer.C1.pause();
         this.wavesurfer.C0 && this.wavesurfer.C0.pause();
-        if(isOnClick && this.props.data.file_info.nchannels === 2){
+        if(isOnClick && this.props.enable_speech_audio){
             if(this.wavesurfer.C1.getCurrentTime() > this.wavesurfer.C0.getCurrentTime()){
                 this.wavesurfer.C1 && this.wavesurfer.C1.play();
                 this.wavesurfer.C0 && this.wavesurfer.C0.play(this.wavesurfer.C1.getCurrentTime());
@@ -438,7 +440,7 @@ class AudioPlayer extends PureComponent {
             }
         });
 
-        if (this.props.data.file_info.nchannels === 2) {
+        if (this.props.enable_speech_audio) {
             this.wavesurfer.C1.on('pause', () => {
                 this.setState({ pause: true }, () => {
                     if (this.props.pause !== this.state.pause && this.props.onPauseChange) {

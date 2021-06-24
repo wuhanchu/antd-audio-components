@@ -435,7 +435,7 @@ class TalkTimeLine extends PureComponent {
         // 关联选择角色的性别
         let customer_servicer_sex;
         let customer_sex;
-        if (this.props.nchannels !== 2) {
+        if (!this.props.enable_speech_audio) {
             for (let i = dialogue.length - 1; i >= 0; i--) {
                 if (dialogue[i].role === 'customer_servicer') {
                     if (dialogue[i].labels && dialogue[i].labels.man) {
