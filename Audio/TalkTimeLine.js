@@ -94,7 +94,7 @@ class TalkTimeLine extends PureComponent {
             !_.isNil(this.props.playId);
             try {
                 this.scrollToItem(this.dialogueMap[this.props.playId].item);
-            } catch (error) {}
+            } catch (error) { }
         }
 
         if (this.props.dialogue !== prevProps.dialogue) {
@@ -435,70 +435,61 @@ class TalkTimeLine extends PureComponent {
         // 关联选择角色的性别
         let customer_servicer_sex;
         let customer_sex;
-        if (!this.props.enable_speech_audio) {
-            for (let i = dialogue.length - 1; i >= 0; i--) {
-                if (dialogue[i].role === 'customer_servicer') {
-                    if (dialogue[i].labels && dialogue[i].labels.man) {
-                        customer_servicer_sex = { man: true };
-                    } else if (dialogue[i].labels && dialogue[i].labels.woman) {
-                        customer_servicer_sex = { woman: true };
-                    } else {
-                        customer_servicer_sex = undefined;
-                    }
-                }
 
-                if (dialogue[i].role === 'customer') {
-                    if (dialogue[i].labels && dialogue[i].labels.man) {
-                        customer_sex = { man: true };
-                    } else if (dialogue[i].labels && dialogue[i].labels.woman) {
-                        customer_sex = { woman: true };
-                    } else {
-                        customer_sex = undefined;
-                    }
-                }
-            }
-            if (checkFunc) {
-                checkFunc(item);
-            }
-            let role = { ...item.role };
-            const labels = { ...item.labels };
-            labels.man = false;
-            labels.woman = false;
 
-            role = value;
-            if (item.role === value) {
-                role = null;
-            }
-            if (this.props.onItemChange) {
-                if (role === 'customer_servicer') {
-                    this.props.onItemChange({
-                        ...item,
-                        role,
-                        labels: { ...labels, ...customer_servicer_sex },
-                    });
-                } else if (role === 'customer') {
-                    this.props.onItemChange({
-                        ...item,
-                        role,
-                        labels: { ...labels, ...customer_sex },
-                    });
+        for (let i = dialogue.length - 1; i >= 0; i--) {
+            if (dialogue[i].role === 'customer_servicer') {
+                if (dialogue[i].labels && dialogue[i].labels.man) {
+                    customer_servicer_sex = { man: true };
+                } else if (dialogue[i].labels && dialogue[i].labels.woman) {
+                    customer_servicer_sex = { woman: true };
                 } else {
-                    this.props.onItemChange({ ...item, role });
+                    customer_servicer_sex = undefined;
                 }
             }
-        } else {
-            let dialogueArr = Immutable.asMutable(this.props.dialogue);
-            dialogueArr = dialogueArr.map((items) => {
-                if (items.channel_id === item.channel_id) {
-                    return { ...items, role: value };
+
+            if (dialogue[i].role === 'customer') {
+                if (dialogue[i].labels && dialogue[i].labels.man) {
+                    customer_sex = { man: true };
+                } else if (dialogue[i].labels && dialogue[i].labels.woman) {
+                    customer_sex = { woman: true };
+                } else {
+                    customer_sex = undefined;
                 }
-                if (value === 'customer_servicer') {
-                    return { ...items, role: 'customer' };
-                }
-                return { ...items, role: 'customer_servicer' };
-            });
-            this.props.handleChangeDialogue(Immutable(dialogueArr));
+            }
         }
+        if (checkFunc) {
+            checkFunc(item);
+        }
+        let role = { ...item.role };
+        const labels = { ...item.labels };
+        labels.man = false;
+        labels.woman = false;
+
+        role = value;
+        if (item.role === value) {
+            role = null;
+        }
+        if (this.props.onItemChange) {
+            if (role === 'customer_servicer') {
+                this.props.onItemChange({
+                    ...item,
+                    role,
+                    labels: { ...labels, ...customer_servicer_sex },
+                });
+
+            } else if (role === 'customer') {
+                this.props.onItemChange({
+                    ...item,
+                    role,
+                    labels: { ...labels, ...customer_sex },
+                });
+
+            } else {
+                this.props.onItemChange({ ...item, role });
+            }
+        }
+
     };
 
     renderTag = (item, index, label, inStyle) => {

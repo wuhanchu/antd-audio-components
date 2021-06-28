@@ -548,7 +548,9 @@ export default class MarkItem extends PureComponent {
      */
     handleItemChange = (item) => {
         const index = this.dialogueIndexMap[item.id];
+        console.log("handleItemChange")
 
+        console.log(item)
         if (
             this.state.dialogue.some((checkItem, checkIndex) => {
                 const max = [item.beginTime, checkItem.beginTime];

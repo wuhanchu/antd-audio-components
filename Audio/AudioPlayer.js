@@ -274,27 +274,27 @@ class AudioPlayer extends PureComponent {
                 const currentTimeC1 = this.wavesurfer.C1 && this.wavesurfer.C1.getCurrentTime();
 
                 if (currentTimeC0 > region.end || currentTimeC1 > region.end) {
-                    if (this.props.dialogue[this.props.playId].channel_id === 'C1') {
+                    if (this.props.dialogue[this.props.playId].channel_id === 'C1'&& this.props.enable_speech_audio) {
 
                         this.wavesurfer.C1.play(region.start, region.end);
                     } else {
                         this.wavesurfer.C0.play(region.start, region.end);
                     }
-                } else if (this.props.dialogue[this.props.playId].channel_id === 'C1') {
+                } else if (this.props.dialogue[this.props.playId].channel_id === 'C1' && this.props.enable_speech_audio) {
                     this.wavesurfer.C1.play(currentTimeC1, region.end);
                 } else {
                     this.wavesurfer.C0.play(currentTimeC0, region.end);
 
                 }
             } else {
-                if (this.props.playId && this.props.dialogue[this.props.playId].channel_id === 'C1') {
+                if (this.props.playId && this.props.dialogue[this.props.playId].channel_id === 'C1' && this.props.enable_speech_audio) {
                     this.wavesurfer.C1.play();
                 } else {
                     this.wavesurfer.C0.play();
                 }
             }
         } else {
-            if (this.props.playId && this.props.dialogue[this.props.playId].channel_id === 'C1') {
+            if (this.props.playId && this.props.dialogue[this.props.playId].channel_id === 'C1' && this.props.enable_speech_audio) {
                 this.wavesurfer.C1.play();
                 
             } else {
@@ -352,7 +352,7 @@ class AudioPlayer extends PureComponent {
                     const region = this.regions[this.state.playId];
 
                     if (!this.props.pause && region) {
-                        if (this.props.dialogue[this.props.playId].channel_id === 'C1') {
+                        if (this.props.dialogue[this.props.playId].channel_id === 'C1'&& this.props.enable_speech_audio) {
                             this.wavesurfer.C1 && this.wavesurfer.C1.play(region.start, region.end);
                             this.wavesurfer.C0 && this.wavesurfer.C0.pause();
                         } else {
@@ -519,7 +519,7 @@ class AudioPlayer extends PureComponent {
         if (dialogue) {
             dialogue.forEach((item, index) => {
                 let start;
-                if (item.channel_id === 'C1') {
+                if (item.channel_id === 'C1' && this.props.enable_speech_audio) {
                     start =
                         lastItem.C1 && item.beginTime < lastItem.C1.endTime
                             ? lastItem.C1.endTime
@@ -546,7 +546,7 @@ class AudioPlayer extends PureComponent {
                     end: item.endTime / 1000,
                     color: 'rgb(63, 63, 68,0.4)',
                 };
-                if (item.channel_id === 'C1') {
+                if (item.channel_id === 'C1' && this.props.enable_speech_audio) {
                     this.regions[item.id] = this.wavesurfer.C1.addRegion(options);
                     lastItem.C1 = item;
                 } else {
